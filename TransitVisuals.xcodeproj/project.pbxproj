@@ -8,34 +8,46 @@
 
 /* Begin PBXBuildFile section */
 		711C787F2EBED8AB05692F4B /* Pods_TransitVisuals.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37B4A12E5E35D3B0A32DAE10 /* Pods_TransitVisuals.framework */; };
-		89094E7D28993DF200270B84 /* google_transit in Resources */ = {isa = PBXBuildFile; fileRef = 89094E7C28993DF100270B84 /* google_transit */; };
 		8921F2D8289BBD3E000A1B4B /* MapViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8921F2D7289BBD3E000A1B4B /* MapViewDelegate.swift */; };
 		8921F2DA289BBDB9000A1B4B /* RealTimeVehicleController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8921F2D9289BBDB9000A1B4B /* RealTimeVehicleController.swift */; };
+		89326EBC289BF4A20091EEFE /* RealTimeTripController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89326EBB289BF4A20091EEFE /* RealTimeTripController.swift */; };
+		893EB4B628A45EAC00C7FB12 /* assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 893EB4B528A45EAC00C7FB12 /* assets.xcassets */; };
+		8974F3CB28AD7D1A002938F0 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8974F3CA28AD7D1A002938F0 /* Constants.swift */; };
+		8980A82328A4CEA100AE6633 /* ResourceFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8980A82228A4CEA100AE6633 /* ResourceFetcher.swift */; };
+		8980A82E28A4DA8300AE6633 /* BusAnnotation.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8980A82D28A4DA8300AE6633 /* BusAnnotation.xib */; };
+		8980A83028A4DADC00AE6633 /* BusAnnotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8980A82F28A4DADC00AE6633 /* BusAnnotation.swift */; };
+		898FF7A92965194B00745426 /* ResourcesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 898FF7A82965194B00745426 /* ResourcesManager.swift */; };
 		89BBAEB82898EF44008F21CD /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89BBAEB72898EF44008F21CD /* AppDelegate.swift */; };
 		89BBAEBA2898EF44008F21CD /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89BBAEB92898EF44008F21CD /* SceneDelegate.swift */; };
 		89BBAEBC2898EF44008F21CD /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89BBAEBB2898EF44008F21CD /* ViewController.swift */; };
 		89BBAEBF2898EF44008F21CD /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 89BBAEBD2898EF44008F21CD /* Main.storyboard */; };
-		89BBAEC12898EF4A008F21CD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 89BBAEC02898EF4A008F21CD /* Assets.xcassets */; };
 		89BBAEC42898EF4A008F21CD /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 89BBAEC22898EF4A008F21CD /* LaunchScreen.storyboard */; };
 		89BBAECC2898EFB1008F21CD /* gtfs-realtime.pb.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89BBAECB2898EFB1008F21CD /* gtfs-realtime.pb.swift */; };
+		89BE0B2128B04B89006DB397 /* TripShapes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89BE0B2028B04B89006DB397 /* TripShapes.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		37B4A12E5E35D3B0A32DAE10 /* Pods_TransitVisuals.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TransitVisuals.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		67A270D1AF26B268B7D4C00E /* Pods-TransitVisuals.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TransitVisuals.release.xcconfig"; path = "Target Support Files/Pods-TransitVisuals/Pods-TransitVisuals.release.xcconfig"; sourceTree = "<group>"; };
 		6CFEF8BA698AA24AC5C345EE /* Pods-TransitVisuals.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TransitVisuals.debug.xcconfig"; path = "Target Support Files/Pods-TransitVisuals/Pods-TransitVisuals.debug.xcconfig"; sourceTree = "<group>"; };
-		89094E7C28993DF100270B84 /* google_transit */ = {isa = PBXFileReference; lastKnownFileType = folder; path = google_transit; sourceTree = "<group>"; };
 		8921F2D7289BBD3E000A1B4B /* MapViewDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MapViewDelegate.swift; path = ../../../../../Applications/MapViewDelegate.swift; sourceTree = "<group>"; };
 		8921F2D9289BBDB9000A1B4B /* RealTimeVehicleController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealTimeVehicleController.swift; sourceTree = "<group>"; };
+		89326EBB289BF4A20091EEFE /* RealTimeTripController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealTimeTripController.swift; sourceTree = "<group>"; };
+		893EB4B528A45EAC00C7FB12 /* assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = assets.xcassets; sourceTree = "<group>"; };
+		8974F3CA28AD7D1A002938F0 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		8980A82228A4CEA100AE6633 /* ResourceFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceFetcher.swift; sourceTree = "<group>"; };
+		8980A82D28A4DA8300AE6633 /* BusAnnotation.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = BusAnnotation.xib; sourceTree = "<group>"; };
+		8980A82F28A4DADC00AE6633 /* BusAnnotation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BusAnnotation.swift; sourceTree = "<group>"; };
+		898FF7A82965194B00745426 /* ResourcesManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourcesManager.swift; sourceTree = "<group>"; };
 		89BBAEB42898EF44008F21CD /* TransitVisuals.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TransitVisuals.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		89BBAEB72898EF44008F21CD /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		89BBAEB92898EF44008F21CD /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		89BBAEBB2898EF44008F21CD /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		89BBAEBE2898EF44008F21CD /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		89BBAEC02898EF4A008F21CD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		89BBAEC32898EF4A008F21CD /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		89BBAEC52898EF4A008F21CD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		89BBAECB2898EFB1008F21CD /* gtfs-realtime.pb.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "gtfs-realtime.pb.swift"; sourceTree = "<group>"; };
+		89BE0B2028B04B89006DB397 /* TripShapes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripShapes.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,6 +68,15 @@
 				37B4A12E5E35D3B0A32DAE10 /* Pods_TransitVisuals.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		8980A82428A4D18E00AE6633 /* BusAnnotation */ = {
+			isa = PBXGroup;
+			children = (
+				8980A82D28A4DA8300AE6633 /* BusAnnotation.xib */,
+				8980A82F28A4DADC00AE6633 /* BusAnnotation.swift */,
+			);
+			path = BusAnnotation;
 			sourceTree = "<group>";
 		};
 		89BBAEAB2898EF44008F21CD = {
@@ -79,19 +100,32 @@
 		89BBAEB62898EF44008F21CD /* TransitVisuals */ = {
 			isa = PBXGroup;
 			children = (
-				89094E7C28993DF100270B84 /* google_transit */,
+				89BE0B1F28B04B67006DB397 /* Models */,
+				8974F3CA28AD7D1A002938F0 /* Constants.swift */,
 				89BBAECB2898EFB1008F21CD /* gtfs-realtime.pb.swift */,
+				8980A82428A4D18E00AE6633 /* BusAnnotation */,
 				89BBAEB72898EF44008F21CD /* AppDelegate.swift */,
 				89BBAEB92898EF44008F21CD /* SceneDelegate.swift */,
 				89BBAEBB2898EF44008F21CD /* ViewController.swift */,
 				8921F2D7289BBD3E000A1B4B /* MapViewDelegate.swift */,
 				8921F2D9289BBDB9000A1B4B /* RealTimeVehicleController.swift */,
+				89326EBB289BF4A20091EEFE /* RealTimeTripController.swift */,
+				8980A82228A4CEA100AE6633 /* ResourceFetcher.swift */,
 				89BBAEBD2898EF44008F21CD /* Main.storyboard */,
-				89BBAEC02898EF4A008F21CD /* Assets.xcassets */,
 				89BBAEC22898EF4A008F21CD /* LaunchScreen.storyboard */,
 				89BBAEC52898EF4A008F21CD /* Info.plist */,
+				893EB4B528A45EAC00C7FB12 /* assets.xcassets */,
+				898FF7A82965194B00745426 /* ResourcesManager.swift */,
 			);
 			path = TransitVisuals;
+			sourceTree = "<group>";
+		};
+		89BE0B1F28B04B67006DB397 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				89BE0B2028B04B89006DB397 /* TripShapes.swift */,
+			);
+			name = Models;
 			sourceTree = "<group>";
 		};
 		EF49D4D98CB25F689D9E3915 /* Pods */ = {
@@ -164,9 +198,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				89BBAEC42898EF4A008F21CD /* LaunchScreen.storyboard in Resources */,
-				89BBAEC12898EF4A008F21CD /* Assets.xcassets in Resources */,
 				89BBAEBF2898EF44008F21CD /* Main.storyboard in Resources */,
-				89094E7D28993DF200270B84 /* google_transit in Resources */,
+				893EB4B628A45EAC00C7FB12 /* assets.xcassets in Resources */,
+				8980A82E28A4DA8300AE6633 /* BusAnnotation.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -219,8 +253,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8980A83028A4DADC00AE6633 /* BusAnnotation.swift in Sources */,
+				898FF7A92965194B00745426 /* ResourcesManager.swift in Sources */,
 				89BBAEBC2898EF44008F21CD /* ViewController.swift in Sources */,
+				89BE0B2128B04B89006DB397 /* TripShapes.swift in Sources */,
+				8980A82328A4CEA100AE6633 /* ResourceFetcher.swift in Sources */,
+				89326EBC289BF4A20091EEFE /* RealTimeTripController.swift in Sources */,
 				8921F2D8289BBD3E000A1B4B /* MapViewDelegate.swift in Sources */,
+				8974F3CB28AD7D1A002938F0 /* Constants.swift in Sources */,
 				89BBAECC2898EFB1008F21CD /* gtfs-realtime.pb.swift in Sources */,
 				8921F2DA289BBDB9000A1B4B /* RealTimeVehicleController.swift in Sources */,
 				89BBAEB82898EF44008F21CD /* AppDelegate.swift in Sources */,
@@ -370,6 +410,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = FFHB5F748K;
@@ -399,6 +440,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = FFHB5F748K;
