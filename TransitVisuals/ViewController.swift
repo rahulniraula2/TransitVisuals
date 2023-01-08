@@ -41,10 +41,11 @@ class ViewController: UIViewController, URLSessionDelegate, CLLocationManagerDel
     
     let defautls = UserDefaults.standard
     
-    
     @IBOutlet weak var loadingView: UIView!
     @IBOutlet weak var progressBar: UIProgressView!
     @IBOutlet weak var progressLabel: UILabel!
+    
+    var coreDataTime = Date()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -56,23 +57,20 @@ class ViewController: UIViewController, URLSessionDelegate, CLLocationManagerDel
         self.centerMap(animated: false)
         self.loadCoreData()
         
-        ResourceManager().fetchInitialResources(for: self, progressHandler: updateProgressBar){
+        /*ResourceManager().fetchInitialResources(for: self, progressHandler: updateProgressBar){
             DispatchQueue.main.async {
                 self.initMap()
             }
-        }
+        }*/
     }
     
     func loadCoreData(){
         let timeStarted1 = Date()
-        
-        Task.init(priority: .medium){
-            let test = await DataMangagerInitializer.shared.initializeDataBase()
-            DispatchQueue.main.async {
-                print("Successfully returned \(test)")
-            }
-        }
-        
+        self.coreDataTime = timeStarted1
+        let dm = DataMangagerInitializer()
+        dm.delegate = self
+        dm.initializeDataBase()
+        //dm.testLoadingLargeData()
         let tsf = String(format: "%3.0f", timeStarted1.timeIntervalSinceNow * -1000.0)
         print("Loading Core Data Took: \(tsf)")
     }
@@ -97,6 +95,15 @@ class ViewController: UIViewController, URLSessionDelegate, CLLocationManagerDel
         }
     }
     
+}
+
+extension ViewController: DataMangagerInitializerDelegate{
+    func DataMangager(_ dataManager: DataMangagerInitializer, didFinishLoadingCoreData: Void) {
+        DispatchQueue.main.async {
+            debugPrint("DONE LOADING ALL DATA YEYYYYY")
+            dataManager.printTime(since: self.coreDataTime, task: "Doing Everything")
+        }
+    }
 }
 
 
