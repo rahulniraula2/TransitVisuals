@@ -24,6 +24,8 @@
 		89BBAEC42898EF4A008F21CD /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 89BBAEC22898EF4A008F21CD /* LaunchScreen.storyboard */; };
 		89BBAECC2898EFB1008F21CD /* gtfs-realtime.pb.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89BBAECB2898EFB1008F21CD /* gtfs-realtime.pb.swift */; };
 		89BE0B2128B04B89006DB397 /* TripShapes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89BE0B2028B04B89006DB397 /* TripShapes.swift */; };
+		89F384C229692EB400D1E504 /* DataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 89F384C029692EB400D1E504 /* DataModel.xcdatamodeld */; };
+		89F384C42969346800D1E504 /* DataManagerIntitializer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89F384C32969346800D1E504 /* DataManagerIntitializer.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -48,6 +50,8 @@
 		89BBAEC52898EF4A008F21CD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		89BBAECB2898EFB1008F21CD /* gtfs-realtime.pb.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "gtfs-realtime.pb.swift"; sourceTree = "<group>"; };
 		89BE0B2028B04B89006DB397 /* TripShapes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripShapes.swift; sourceTree = "<group>"; };
+		89F384C129692EB400D1E504 /* DataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = DataModel.xcdatamodel; sourceTree = "<group>"; };
+		89F384C32969346800D1E504 /* DataManagerIntitializer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataManagerIntitializer.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -100,6 +104,7 @@
 		89BBAEB62898EF44008F21CD /* TransitVisuals */ = {
 			isa = PBXGroup;
 			children = (
+				89F384C029692EB400D1E504 /* DataModel.xcdatamodeld */,
 				89BE0B1F28B04B67006DB397 /* Models */,
 				8974F3CA28AD7D1A002938F0 /* Constants.swift */,
 				89BBAECB2898EFB1008F21CD /* gtfs-realtime.pb.swift */,
@@ -116,6 +121,7 @@
 				89BBAEC52898EF4A008F21CD /* Info.plist */,
 				893EB4B528A45EAC00C7FB12 /* assets.xcassets */,
 				898FF7A82965194B00745426 /* ResourcesManager.swift */,
+				89F384C32969346800D1E504 /* DataManagerIntitializer.swift */,
 			);
 			path = TransitVisuals;
 			sourceTree = "<group>";
@@ -262,7 +268,9 @@
 				8921F2D8289BBD3E000A1B4B /* MapViewDelegate.swift in Sources */,
 				8974F3CB28AD7D1A002938F0 /* Constants.swift in Sources */,
 				89BBAECC2898EFB1008F21CD /* gtfs-realtime.pb.swift in Sources */,
+				89F384C42969346800D1E504 /* DataManagerIntitializer.swift in Sources */,
 				8921F2DA289BBDB9000A1B4B /* RealTimeVehicleController.swift in Sources */,
+				89F384C229692EB400D1E504 /* DataModel.xcdatamodeld in Sources */,
 				89BBAEB82898EF44008F21CD /* AppDelegate.swift in Sources */,
 				89BBAEBA2898EF44008F21CD /* SceneDelegate.swift in Sources */,
 			);
@@ -486,6 +494,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		89F384C029692EB400D1E504 /* DataModel.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				89F384C129692EB400D1E504 /* DataModel.xcdatamodel */,
+			);
+			currentVersion = 89F384C129692EB400D1E504 /* DataModel.xcdatamodel */;
+			path = DataModel.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 89BBAEAC2898EF44008F21CD /* Project object */;
 }

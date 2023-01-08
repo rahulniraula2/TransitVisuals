@@ -54,12 +54,28 @@ class ViewController: UIViewController, URLSessionDelegate, CLLocationManagerDel
         mapView.isRotateEnabled = false
         
         self.centerMap(animated: false)
+        self.loadCoreData()
         
         ResourceManager().fetchInitialResources(for: self, progressHandler: updateProgressBar){
-            self.initMap()
+            DispatchQueue.main.async {
+                self.initMap()
+            }
         }
     }
     
+    func loadCoreData(){
+        let timeStarted1 = Date()
+        
+        Task.init(priority: .medium){
+            let test = await DataMangagerInitializer.shared.initializeDataBase()
+            DispatchQueue.main.async {
+                print("Successfully returned \(test)")
+            }
+        }
+        
+        let tsf = String(format: "%3.0f", timeStarted1.timeIntervalSinceNow * -1000.0)
+        print("Loading Core Data Took: \(tsf)")
+    }
     
     func updateProgressBar(progress: Progress){
         DispatchQueue.main.async {

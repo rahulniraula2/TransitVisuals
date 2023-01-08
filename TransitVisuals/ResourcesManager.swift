@@ -20,16 +20,16 @@ class ResourceManager {
     func generateResourceRequest(onlyHead: Bool = false) -> URLRequest {
         var request = URLRequest(url:K.FindGtfsOfflineSourceURL())
         
-        if let oldLastModified = self.defautls.string(forKey: "LastModified") {
-            request.addValue(oldLastModified, forHTTPHeaderField: "If-Modified-Since")
-        }
-        
-        if let oldEtag = self.defautls.string(forKey: "Etag") {
-            request.addValue(oldEtag, forHTTPHeaderField: "If-Match")
-        }
-        
         if(onlyHead) {
             request.httpMethod = "Head"
+            
+            if let oldLastModified = self.defautls.string(forKey: "LastModified") {
+                request.addValue(oldLastModified, forHTTPHeaderField: "If-Modified-Since")
+            }
+            
+            if let oldEtag = self.defautls.string(forKey: "Etag") {
+                request.addValue(oldEtag, forHTTPHeaderField: "If-None-Match")
+            }
         }
         
         return request
@@ -78,7 +78,6 @@ class ResourceManager {
     }
     
     func fetchInitialResources(for controller: ViewController, progressHandler : @escaping (Progress) -> Void, completionHandler: @escaping () -> Void){
-        
         let session = URLSession(configuration: .default)
         
         let request = generateResourceRequest(onlyHead: true)
@@ -87,7 +86,6 @@ class ResourceManager {
             guard let response = response as? HTTPURLResponse else {
                 return
             }
-            
             let statusCode = response.statusCode
             
             if(statusCode == 304){

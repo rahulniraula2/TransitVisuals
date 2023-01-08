@@ -19,7 +19,7 @@ class TripShapes {
     }
 }
 
-class Trips {
+class Trips2 {
     var tripID : Int
     var routeID : Int 
     var headSign: String

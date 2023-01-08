@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21513" systemVersion="22C65" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="Routes" representedClassName=".Routes" syncable="YES" codeGenerationType="class">
+        <attribute name="route_color" attributeType="String"/>
+        <attribute name="route_desc" attributeType="String"/>
+        <attribute name="route_id" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="route_long_name" attributeType="String"/>
+        <attribute name="route_short_name" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+    </entity>
+    <entity name="Shapes" representedClassName=".Shapes" syncable="YES" codeGenerationType="class">
+        <attribute name="shape_id" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="shape_pt_lat" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="shape_pt_lon" optional="YES" attributeType="Double" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="shape_pt_sequence" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+    </entity>
+    <entity name="Stops" representedClassName=".Stops" syncable="YES" codeGenerationType="class">
+        <attribute name="stop_code" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="stop_id" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="stop_lat" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="stop_lon" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="stop_name" attributeType="String"/>
+    </entity>
+    <entity name="StopTimes" representedClassName=".StopTimes" syncable="YES" codeGenerationType="class">
+        <attribute name="arrival_time" optional="YES" attributeType="String"/>
+        <attribute name="departure_time" optional="YES" attributeType="String"/>
+        <attribute name="stop_headsign" optional="YES" attributeType="String"/>
+        <attribute name="stop_id" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="stop_sequence" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="trip_id" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+    </entity>
+    <entity name="Trips" representedClassName=".Trips" syncable="YES" codeGenerationType="class">
+        <attribute name="block_id" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="direction_id" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="route_id" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="service_id" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="shape_id" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="trip_headsign" optional="YES" attributeType="String"/>
+        <attribute name="trip_id" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+    </entity>
+</model>
