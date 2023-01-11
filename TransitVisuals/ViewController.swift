@@ -40,6 +40,8 @@ class ViewController: UIViewController, URLSessionDelegate, CLLocationManagerDel
     var tripShape = [String: MKPolyline]()
     
     let defautls = UserDefaults.standard
+    let resourceManager = ResourceManager()
+
     
     @IBOutlet weak var loadingView: UIView!
     @IBOutlet weak var progressBar: UIProgressView!
@@ -47,44 +49,68 @@ class ViewController: UIViewController, URLSessionDelegate, CLLocationManagerDel
     
     var coreDataTime = Date()
     
+    var isAtBigZoom = false {
+        didSet {
+            if(!oldValue && !isAtBigZoom){
+                return
+            }
+            handleMapRegionChange(showStops: isAtBigZoom)
+        }
+    }
+    var task : Task<Void, Error>? = nil
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        mapView.register(ClusterAnnotationView.self, forAnnotationViewWithReuseIdentifier: MKMapViewDefaultClusterAnnotationViewReuseIdentifier)
+        mapView.register(MKBusStopAnnotationView.self, forAnnotationViewWithReuseIdentifier: MKMapViewDefaultAnnotationViewReuseIdentifier)
         mapView.delegate = self
         mapView.mapType = .mutedStandard
         mapView.isRotateEnabled = false
         
         self.centerMap(animated: false)
-        self.loadCoreData()
+        self.resourceManager.delegate = self
+        self.fetchDataIfNeeded()
+    }
+    
+    func handleMapRegionChange(showStops: Bool){
+        if(showStops){
+            if let task = self.task {
+                task.cancel()
+                if(task.isCancelled){
+                    print("Old Task was cancelled")
+                }
+            }
+            self.task = Task{
+                let stops = await BusStopQueryManager.shared.getAllBusStops(in: mapView.region)
+                print("returned \(stops.count) stops")
+                for stop in stops {
+                    DispatchQueue.main.async {
+                        if self.mapView.view(for: stop) == nil {
+                            self.mapView.addAnnotation(stop)
+                        }
+                    }
+                }
+            }
+        }else{
+            for annot in mapView.annotations{
+                if annot is BusStopAnnotation {
+                    UIView.animate(withDuration: 2) {
+                        self.mapView.removeAnnotation(annot)
+                    }
+                }
+            }
+        }
+    }
+    
+    func fetchDataIfNeeded(){
+        self.resourceManager.fetchInitialResources(for: self)
+    }
+    
+    func updateProgressBar(progress: Double){
+        let textBuilder = String(round(100 * (progress * 100)) / 100) + "% completed\n"
         
-        /*ResourceManager().fetchInitialResources(for: self, progressHandler: updateProgressBar){
-            DispatchQueue.main.async {
-                self.initMap()
-            }
-        }*/
-    }
-    
-    func loadCoreData(){
-        let timeStarted1 = Date()
-        self.coreDataTime = timeStarted1
-        let dm = DataMangagerInitializer()
-        dm.delegate = self
-        dm.initializeDataBase()
-        //dm.testLoadingLargeData()
-        let tsf = String(format: "%3.0f", timeStarted1.timeIntervalSinceNow * -1000.0)
-        print("Loading Core Data Took: \(tsf)")
-    }
-    
-    func updateProgressBar(progress: Progress){
         DispatchQueue.main.async {
-            self.progressBar.progress = Float(progress.fractionCompleted)
-            var textBuilder = String(round(100 * (progress.fractionCompleted * 100)) / 100) + "% completed\n"
-            
-            if let estimatedTimeRemaining : TimeInterval = progress.estimatedTimeRemaining {
-                let timeRemainingInSeconds = String(NSInteger(estimatedTimeRemaining) % 60)
-                textBuilder += String("Estimated time remaining: " + timeRemainingInSeconds + "s")
-            }
-            
+            self.progressBar.setProgress(Float(progress), animated: true)
             self.progressLabel.text = textBuilder
         }
     }
@@ -97,12 +123,27 @@ class ViewController: UIViewController, URLSessionDelegate, CLLocationManagerDel
     
 }
 
-extension ViewController: DataMangagerInitializerDelegate{
-    func DataMangager(_ dataManager: DataMangagerInitializer, didFinishLoadingCoreData: Void) {
+extension ViewController: ResourceManagerDelegate {
+    func resourceManager(_ resourceManager: ResourceManager, updatedProgress: Double) {
+        self.updateProgressBar(progress: updatedProgress)
+    }
+    
+    func resourceManager(_ resourceManager: ResourceManager, didFinishLoadingData: Void) {
         DispatchQueue.main.async {
             debugPrint("DONE LOADING ALL DATA YEYYYYY")
-            dataManager.printTime(since: self.coreDataTime, task: "Doing Everything")
+            DataMangagerInitializer().printTime(since: self.coreDataTime, task: "Doing Everything")
         }
+        //self.loadAllBusStops(display: true)
+    }
+    
+    func resourceManager(_ resourceManager: ResourceManager, newDataAvaliable alert: UIAlertController){
+        DispatchQueue.main.async {
+            self.present(alert, animated: true)
+        }
+    }
+    
+    func resourceManager(_ resourceManager: ResourceManager, updatedLoadingStatus loading: Bool){
+        self.hideLoadingView(hide: !loading)
     }
 }
 

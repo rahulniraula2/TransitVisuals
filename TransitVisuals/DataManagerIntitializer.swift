@@ -9,62 +9,33 @@ import CoreData
 import SwiftCSV
 
 class DataMangagerInitializer {
+    
+    //MARK: - Global Variables
     private let documentsUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+    static let shared = DataMangagerInitializer()
+    
+    /// CoreData
     private let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     private let pc = (UIApplication.shared.delegate as! AppDelegate).persistentContainer
-    var delegate : DataMangagerInitializerDelegate? = nil
-    static let shared = DataMangagerInitializer()
+    
+    /// Serial Queues. Helps with concurent processes with safe data access
+    private let serialQueue = DispatchQueue(label: "TaskNotification.DataManagerInitializer")
+    private let progressQueue = DispatchQueue(label: "ProgressUpdater.DataManagerInitializer")
+    
+    /// Progress Checker Variables
     private var TasksDelete : [String:Bool] = [:]
     private var TasksAdd : [String:Bool] = [:]
-    private let serialQueue = DispatchQueue(label: "TaskNotification.DataManagerInitializer")
     private var totalStopTimeThreads = -1
     private var totalStopTimeThreadsCompleted = 0
+    private var totalCompletedForNotification = 0.0
+    
+    /// External Delegate
+    var delegate : DataMangagerInitializerDelegate? = nil
+    
+    //MARK: - Public Methods
     
     init(){
-        
-    }
-    
-    func testLoadingLargeData(){
-        DispatchQueue.global(qos: .default).async {
-            self.deleteAllEntity(K.CoreData.Entities.StopTimes)
-            self.concurentLoadStopTime()
-        }
-    }
-    
-    func concurentLoadStopTime(){
-        let fileName = "stop_times.txt"
-        var csv = getCSV(fileName)
-        enumerateCSVConCurrent(csv, entityName: K.CoreData.Entities.StopTimes)
-    }
-    
-    private func enumerateCSVConCurrent(_ csv : CSV<Enumerated>, entityName : String) {
-        let total = csv.rows.count
-        let rowPerBatch = 320000
-        let totalBatches = (total / rowPerBatch) + 1
-        debugPrint("Total rows: \(total), so total threads running: \(totalBatches)")
-        self.totalStopTimeThreads = totalBatches
-        for batch in 0..<totalBatches {
-            let startCount = (batch * rowPerBatch) + 1
-            pc.performBackgroundTask { context in
-                let time = Date()
-                do{
-                    try csv.enumerateAsArray(startAt: startCount,rowLimit: rowPerBatch) { arr in
-                        let stopTime = StopTimes(context: context)
-                        stopTime.trip_id = Int32(arr[0])!
-                        stopTime.stop_id = Int32(arr[3])!
-                        stopTime.stop_sequence = Int16(arr[4])!
-                        stopTime.arrival_time = arr[1]
-                        stopTime.departure_time = arr[2]
-                        stopTime.stop_headsign = arr[5]
-                    }
-                } catch {
-                    debugPrint("Error Adding data for \(entityName)")
-                }
-                self.saveContext(context: context)
-                self.updateLoadResult(entityName, concurrent: true)
-                self.printTime(since: time, task: "Loading \(entityName) in batch \(batch)")
-            }
-        }
+        self.initializeTaskCompletionData()
     }
     
     func initializeDataBase(){
@@ -72,37 +43,48 @@ class DataMangagerInitializer {
         self.initializeTaskCompletionData()
         
         DispatchQueue.global(qos: .default).async {
-            let entities = K.CoreData.Entities.all
-            for entity in entities {
-                self.deleteAllEntity(entity)
-            }
-            self.initAll()
+            self.deleteAllEntities()
+            self.loadAll()
         }
     }
     
-    private func initAll() {
+    func deleteAllEntities(){
+        let entities = K.CoreData.Entities.all
+        for entity in entities {
+            self.deleteAllEntity(entity)
+        }
+    }
+    
+    func loadOnly(){
+        self.loadAll()
+    }
+    
+    //MARK: - Database loading helpers
+    
+    private func loadAll() {
         DispatchQueue.global(qos: .default).async {
-            self.initRoutes()
+            self.loadRoutes()
         }
         DispatchQueue.global(qos: .default).async {
-            self.initShapes()
+            self.loadShapes()
         }
         DispatchQueue.global(qos: .default).async {
-            self.initStops()
+            self.loadStops()
         }
         DispatchQueue.global(qos: .default).async {
             //self.initStopTimes()
             self.concurentLoadStopTime()
         }
         DispatchQueue.global(qos: .default).async {
-            self.initTrips()
+            self.loadTrips()
         }
     }
     
-    private func initRoutes() {
+    private func loadRoutes() {
         let fileName = "routes.txt"
         let csv = getCSV(fileName)
-        enumerateCSV(csv, entityName: K.CoreData.Entities.Routes ) { dist, context in
+        self.updateProgress(value: 18)
+        enumerateCSV(csv, entityName: K.CoreData.Entities.Routes, progressWeight: 567 ) { dist, context in
             let route = Routes(context: context)
             route.route_id = Int32(dist["route_id"]!)!
             route.route_color = dist["route_color"]!
@@ -112,10 +94,11 @@ class DataMangagerInitializer {
         }
     }
     
-    private func initShapes() {
+    private func loadShapes() {
         let fileName = "shapes.txt"
         let csv = getCSV(fileName)
-        enumerateCSV(csv, entityName: K.CoreData.Entities.Shapes) { dist, context in
+        self.updateProgress(value: 443)
+        enumerateCSV(csv, entityName: K.CoreData.Entities.Shapes, progressWeight: 1904) { dist, context in
             let shape = Shapes(context: context)
             shape.shape_id = Int32(dist["shape_id"]!)!
             shape.shape_pt_lat = Double(dist["shape_pt_lat"]!)!
@@ -124,10 +107,11 @@ class DataMangagerInitializer {
         }
     }
     
-    private func initStops() {
+    private func loadStops() {
         let fileName = "stops.txt"
         let csv = getCSV(fileName)
-        enumerateCSV(csv, entityName: K.CoreData.Entities.Stops) { dist, context in
+        self.updateProgress(value: 39)
+        enumerateCSV(csv, entityName: K.CoreData.Entities.Stops, progressWeight: 562) { dist, context in
             let stop = Stops(context: context)
             stop.stop_code = Int32(dist["stop_code"]!)!
             stop.stop_id = Int32(dist["stop_id"]!)!
@@ -137,11 +121,11 @@ class DataMangagerInitializer {
         }
     }
     
-    private func initStopTimes() {
+    private func loadStopTimes() {
         let fileName = "stop_times.txt"
-        
         let csv = getCSV(fileName)
-        enumerateCSV(csv, entityName: K.CoreData.Entities.StopTimes) { dist, context in
+        self.updateProgress(value: 8998)
+        enumerateCSV(csv, entityName: K.CoreData.Entities.StopTimes, progressWeight: 13000) { dist, context in
             let stopTime = StopTimes(context: context)
             stopTime.trip_id = Int32(dist["trip_id"]!)!
             stopTime.stop_id = Int32(dist["stop_id"]!)!
@@ -152,10 +136,11 @@ class DataMangagerInitializer {
         }
     }
     
-    private func initTrips() {
+    private func loadTrips() {
         let fileName = "trips.txt"
         let csv = getCSV(fileName)
-        enumerateCSV(csv, entityName: K.CoreData.Entities.Trips) { dist, context in
+        self.updateProgress(value: 312)
+        enumerateCSV(csv, entityName: K.CoreData.Entities.Trips, progressWeight: 1094) { dist, context in
             let trip = Trips(context: context)
             trip.trip_id = Int32(dist["trip_id"]!)!
             trip.shape_id = Int32(dist["shape_id"]!)!
@@ -167,20 +152,53 @@ class DataMangagerInitializer {
         }
     }
     
-    private func initializeTaskCompletionData(){
+    private func concurentLoadStopTime(){
+        let fileName = "stop_times.txt"
+        let csv = getCSV(fileName)
+        self.updateProgress(value: 8998)
+        enumerateCSVConCurrent(csv, entityName: K.CoreData.Entities.StopTimes)
+    }
+    
+    private func enumerateCSVConCurrent(_ csv : CSV<Enumerated>, entityName : String) {
+        let total = csv.rows.count
+        let rowPerBatch = 250000
+        let totalBatches = (total / rowPerBatch) + 1
+        debugPrint("Total rows: \(total), so total threads running: \(totalBatches)")
         serialQueue.async {
-            self.initializeAEntityDictionaryToFalse(&self.TasksAdd)
-            self.initializeAEntityDictionaryToFalse(&self.TasksDelete)
+            self.totalStopTimeThreads = totalBatches
+        }
+        for batch in 0..<totalBatches {
+            let startCount = (batch * rowPerBatch) + 1
+            pc.performBackgroundTask { context in
+                let time = Date()
+                var i = 0
+                do{
+                    try csv.enumerateAsArray(startAt: startCount,rowLimit: rowPerBatch) { arr in
+                        let stopTime = StopTimes(context: context)
+                        stopTime.trip_id = Int32(arr[0])!
+                        stopTime.stop_id = Int32(arr[3])!
+                        stopTime.stop_sequence = Int16(arr[4])!
+                        stopTime.arrival_time = arr[1]
+                        stopTime.departure_time = arr[2]
+                        stopTime.stop_headsign = arr[5]
+                        i = i+1
+                        if(i % 10000 == 0){
+                            self.saveContext(context: context)
+                        }
+                    }
+                } catch {
+                    debugPrint("Error Adding data for \(entityName)")
+                }
+                self.saveContext(context: context)
+                self.updateLoadResult(entityName, concurrent: true)
+                self.printTime(since: time, task: "Loading \(entityName) in batch \(batch)")
+                
+                self.updateProgress(value: 7466 * self.pow(0.4574, times: batch))
+            }
         }
     }
     
-    private func initializeAEntityDictionaryToFalse(_ Tasks : inout [String:Bool]){
-        for entity in K.CoreData.Entities.all{
-                Tasks[entity] = false
-        }
-    }
-    
-    private func enumerateCSV(_ csv : CSV<Enumerated>, entityName : String, _ handler: @escaping ([String : String], _ context: NSManagedObjectContext) -> Void) {
+    private func enumerateCSV(_ csv : CSV<Enumerated>, entityName : String, progressWeight: Double, _ handler: @escaping ([String : String], _ context: NSManagedObjectContext) -> Void) {
         pc.performBackgroundTask { context in
             let time = Date()
             var i = 0
@@ -198,6 +216,7 @@ class DataMangagerInitializer {
             self.saveContext(context: context)
             self.printTime(since: time, task: "Loading \(entityName)")
             self.updateLoadResult(entityName)
+            self.updateProgress(value: progressWeight)
         }
     }
     
@@ -211,8 +230,11 @@ class DataMangagerInitializer {
             debugPrint("Error Loading File \(fileName)")
         }
         printTime(since: stamp, task: "Get CSV for \(fileName)")
+        
         return csv!
     }
+    
+    //MARK: - Database delete helpers
     
     private func deleteAllEntity(_ entityName : String) {
         let request = NSFetchRequest<NSFetchRequestResult>(entityName: entityName)
@@ -234,6 +256,33 @@ class DataMangagerInitializer {
             self.printTime(since: date, task: "Deleting \(entityName) database")
             self.updateDeleteResult(entityName)
         }
+        
+        if(entityName == K.CoreData.Entities.Routes){
+            self.updateProgress(value: 77)
+        } else if(entityName == K.CoreData.Entities.Stops){
+            self.updateProgress(value: 1)
+        } else if(entityName == K.CoreData.Entities.StopTimes){
+            self.updateProgress(value: 1904)
+        } else if(entityName == K.CoreData.Entities.Trips){
+            self.updateProgress(value: 95)
+        } else if(entityName == K.CoreData.Entities.Shapes){
+            self.updateProgress(value: 2671)
+        }
+    }
+    
+    //MARK: - Task completion helpers
+    
+    private func initializeTaskCompletionData(){
+        serialQueue.async {
+            self.initializeAEntityDictionaryToFalse(&self.TasksAdd)
+            self.initializeAEntityDictionaryToFalse(&self.TasksDelete)
+        }
+    }
+    
+    private func initializeAEntityDictionaryToFalse(_ Tasks : inout [String:Bool]){
+        for entity in K.CoreData.Entities.all{
+                Tasks[entity] = false
+        }
     }
     
     private func checkIfDoneProcessing(_ concurrent: Bool = false){
@@ -249,9 +298,6 @@ class DataMangagerInitializer {
         
         self.delegate!.DataMangager(self, didFinishLoadingCoreData: Void())
     }
-    
-    private func updateTaskToComplete(_ task : inout [String:Bool], _ entityName: String){
-            task[entityName] = true    }
     
     private func updateLoadResult(_ entityName: String, concurrent: Bool = false){
         serialQueue.async {
@@ -269,6 +315,11 @@ class DataMangagerInitializer {
         }
     }
     
+    private func updateTaskToComplete(_ task : inout [String:Bool], _ entityName: String){
+            task[entityName] = true    }
+    
+    //MARK: - Core Data Helpers
+    
     private func saveItems(){
         self.saveContext(context: self.context)
     }
@@ -282,15 +333,36 @@ class DataMangagerInitializer {
         }
     }
     
+    //MARK: - Local Misc Helpers
+    
     func printTime(since startTime: Date, task : String){
         let tsf = String(format: "%3.0f", startTime.timeIntervalSinceNow * -1000.0)
         debugPrint("\(task) Took: \(tsf)")
+    }
+    
+    private func pow(_ base: Double, times: Int) -> Double{
+        var start = 1.0
+        for _ in 0..<times{
+            start = start * base
+        }
+        return start
+    }
+    
+    //MARK: - ProgressNotifier
+    
+    private func updateProgress(value : Double){
+        self.progressQueue.async {
+            let total = 31300.0
+            self.totalCompletedForNotification += value
+            self.delegate?.DataMangager(self, updatedProgress: Double(self.totalCompletedForNotification/total))
+        }
     }
     
 }
 
 protocol DataMangagerInitializerDelegate {
     func DataMangager(_ dataManager : DataMangagerInitializer, didFinishLoadingCoreData: Void)
+    func DataMangager(_ dataManager: DataMangagerInitializer, updatedProgress: Double)
 }
 
 extension NSManagedObjectContext {

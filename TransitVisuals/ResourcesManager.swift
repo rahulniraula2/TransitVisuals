@@ -6,6 +6,16 @@ class ResourceManager {
     let defautls = UserDefaults.standard
     
     var observation: NSKeyValueObservation?
+    
+    var delegate : ResourceManagerDelegate?
+    
+    let dataManagerInitializer = DataMangagerInitializer()
+    
+    var fractionComplete = 0.0
+    
+    init() {
+        dataManagerInitializer.delegate = self
+    }
 
     deinit {
         observation?.invalidate()
@@ -49,15 +59,12 @@ class ResourceManager {
         }
     }
     
-    func handleDownloadedDataAtUrl(for controller: ViewController, _ localURL : URL, completionHandler: @escaping () -> Void){
+    func handleDownloadedDataAtUrl(_ localURL : URL){
         let destinationFileUrl = (FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first! as URL)
-        controller.hideLoadingView(hide: true)
         self.deleteAllFilesFromDocumentsFolder()
         do {
             try FileManager().unzipItem(at: localURL, to: destinationFileUrl)
-            DispatchQueue.main.async {
-                completionHandler()
-            }
+            self.dataManagerInitializer.loadOnly()
         } catch (let writeError) {
             print("Error creating a file \(destinationFileUrl) : \(writeError)")
         }
@@ -77,12 +84,20 @@ class ResourceManager {
         }
     }
     
-    func fetchInitialResources(for controller: ViewController, progressHandler : @escaping (Progress) -> Void, completionHandler: @escaping () -> Void){
+    func fetchInitialResources(for controlkler: ViewController){
+        //uncomment to force reload data
+        //self.defautls.set("e", forKey: "Etag")
+        
         let session = URLSession(configuration: .default)
         
         let request = generateResourceRequest(onlyHead: true)
         
         session.downloadTask(with: request, completionHandler: { _, response, err in
+            
+            if let _ = err {
+                self.delegate?.resourceManager(self, didFinishLoadingData: Void())
+            }
+            
             guard let response = response as? HTTPURLResponse else {
                 return
             }
@@ -90,41 +105,59 @@ class ResourceManager {
             
             if(statusCode == 304){
                 print("Not modified no fetch required")
-                completionHandler()
+                self.delegate?.resourceManager(self, didFinishLoadingData: Void())
             }else {
                 print("New Data found")
-                self.presentNewDataAvaliable (for: controller, downloadDataAction: { [self] action in
-                    
-                    controller.hideLoadingView(hide: false)
-                    
+                self.presentNewDataAvaliable (downloadDataAction: { [self] action in
+                    self.dataManagerInitializer.deleteAllEntities()
+                    self.delegate?.resourceManager(self, updatedLoadingStatus: true)
                     let dataTask = session.downloadTask(with: self.generateResourceRequest()){ localURL, _, _ in
                         if let localURL = localURL {
                             self.handleResponse(response)
-                            self.handleDownloadedDataAtUrl(for: controller, localURL, completionHandler: completionHandler)
+                            self.handleDownloadedDataAtUrl(localURL)
                         }
                     }
                 
                     observation = dataTask.progress.observe(\.fractionCompleted) { progress, _ in
-                        progressHandler(progress)
+                        self.fractionComplete = progress.fractionCompleted
                     }
                     
                     dataTask.resume()
                     
                 }, useStaleDataAction : { action in
-                    completionHandler()
+                    self.delegate?.resourceManager(self, didFinishLoadingData: Void())
                 } )
             }
         }).resume()
     }
     
-    func presentNewDataAvaliable(for controller: UIViewController, downloadDataAction : @escaping (UIAlertAction)->(Void), useStaleDataAction : @escaping (UIAlertAction)->(Void)) {
+    func presentNewDataAvaliable(downloadDataAction : @escaping (UIAlertAction)->(Void), useStaleDataAction : @escaping (UIAlertAction)->(Void)) {
         let alert = UIAlertController(title: "New Data Found", message: "Would you like to download new data?", preferredStyle: .actionSheet)
         let downloadAction = UIAlertAction(title: "Download Data", style: .default, handler: downloadDataAction)
         let useStaleAction = UIAlertAction(title: "Use Stale Data", style: .default, handler: useStaleDataAction)
         alert.addAction(downloadAction)
         alert.addAction(useStaleAction)
-        DispatchQueue.main.async {
-            controller.present(alert, animated: true)
-        }
+        self.delegate?.resourceManager(self, newDataAvaliable: alert)
+    }
+}
+
+protocol ResourceManagerDelegate {
+    func resourceManager(_ resourceManager: ResourceManager, didFinishLoadingData: Void)
+    
+    func resourceManager(_ resourceManager: ResourceManager, updatedProgress: Double)
+    
+    func resourceManager(_ resourceManager: ResourceManager, newDataAvaliable alert: UIAlertController)
+    
+    func resourceManager(_ resourceManager: ResourceManager, updatedLoadingStatus loading: Bool)
+}
+
+extension ResourceManager: DataMangagerInitializerDelegate {
+    func DataMangager(_ dataManager: DataMangagerInitializer, didFinishLoadingCoreData: Void) {
+        self.delegate?.resourceManager(self, updatedLoadingStatus: false)
+        self.delegate?.resourceManager(self, didFinishLoadingData: didFinishLoadingCoreData)
+    }
+    
+    func DataMangager(_ dataManager: DataMangagerInitializer, updatedProgress: Double) {
+        self.delegate?.resourceManager(self, updatedProgress: (self.fractionComplete * 0.3) + (updatedProgress*0.70))
     }
 }

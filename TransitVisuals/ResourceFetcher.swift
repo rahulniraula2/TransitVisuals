@@ -46,32 +46,6 @@ extension ViewController {
         return service
     }
     
-    func loadBusStops(){
-        let startTime = Date()
-        
-        let documentsUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first as URL?
-        let stopsUrl = documentsUrl?.appendingPathComponent("stops.txt")
-        if let csvURL = stopsUrl {
-            do{
-                let csv = try CSV<Named>(url: csvURL)
-                csv.rows.forEach({ row in
-                    let busStop = MKPointAnnotation()
-                    busStop.coordinate = CLLocationCoordinate2D(latitude: Double(row["stop_lat"]!) ?? 0.0, longitude: Double(row["stop_lon"]!) ?? 0.0)
-                    busStop.title = "Bus Stop"
-                    busStop.subtitle = row["stop_name"]!
-                    //self.mapView.addAnnotation(busStop)
-                    self.totalBusStops += 1
-                })
-            }catch{
-                print("Error Loading Bus Stops")
-            }
-            
-            
-        }
-        let tsf = String(format: "%3.0f", startTime.timeIntervalSinceNow * -1000.0)
-        print("bus stops took: \(tsf)")
-    }
-    
     func loadTrips(service: String) -> (Set<String>, [String:[String]]){
         let startTime = Date()
         
@@ -147,11 +121,9 @@ extension ViewController {
         print("Shapes took \(tsf)ms")
     }
     
-    
     func initMap(){
         let loadingScreen = showLoadingScreen()
         let serviceID = getTodaysServiceID()
-        loadBusStops()
         let shapes = loadTrips(service: serviceID)
         loadShapes(shapes: shapes.0, tripShapes: shapes.1)
         

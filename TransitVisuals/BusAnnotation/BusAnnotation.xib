@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="21223" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="21507" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_0" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21204"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
+        <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -12,35 +13,37 @@
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
         <view contentMode="scaleToFill" id="ML8-N3-nQQ" customClass="BusAnnotation" customModule="TransitVisuals" customModuleProvider="target">
-            <rect key="frame" x="0.0" y="0.0" width="390" height="844"/>
+            <rect key="frame" x="0.0" y="0.0" width="390" height="310"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="triangle.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="wvt-GW-1pw">
-                    <rect key="frame" x="217.66666666666666" y="420" width="7" height="4.6666666666666856"/>
+                    <rect key="frame" x="217.66666666666666" y="153" width="7" height="4.6666666666666572"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="7" id="3Hx-EC-aP9"/>
                         <constraint firstAttribute="height" constant="7" id="bOu-0H-H9V"/>
                     </constraints>
                 </imageView>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Bk7-G3-sPF">
-                    <rect key="frame" x="180" y="407" width="30" height="30"/>
+                    <rect key="frame" x="180" y="140" width="30" height="30"/>
                     <subviews>
-                        <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="bus.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="ihJ-1j-xN0">
-                            <rect key="frame" x="5" y="4.6666666666666679" width="20" height="21"/>
+                        <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="ihJ-1j-xN0">
+                            <rect key="frame" x="5" y="4.3333333333333321" width="20" height="21.333333333333336"/>
                             <constraints>
                                 <constraint firstAttribute="height" constant="20" id="c4S-ST-WJd"/>
                                 <constraint firstAttribute="width" constant="20" id="l0I-vp-ynO"/>
                             </constraints>
+                            <imageReference key="image" image="bus" catalog="system" symbolScale="default"/>
                         </imageView>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="26A" textAlignment="center" lineBreakMode="clip" baselineAdjustment="alignBaselines" adjustsLetterSpacingToFitWidth="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Bzr-i7-vra">
                             <rect key="frame" x="9.3333333333333428" y="7" width="12" height="10"/>
+                            <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             <constraints>
                                 <constraint firstAttribute="height" constant="10" id="4vS-NA-u1B"/>
                                 <constraint firstAttribute="width" constant="12" id="ugs-Dh-ryg"/>
                             </constraints>
                             <fontDescription key="fontDescription" name="HelveticaNeue-CondensedBold" family="Helvetica Neue" pointSize="7"/>
-                            <color key="textColor" red="0.20561808349999999" green="0.47038370369999999" blue="0.9647536874" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
-                            <nil key="highlightedColor"/>
+                            <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <color key="highlightedColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         </label>
                     </subviews>
                     <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -55,13 +58,13 @@
                 </view>
             </subviews>
             <viewLayoutGuide key="safeArea" id="LQV-gT-KdT"/>
-            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
             <constraints>
                 <constraint firstItem="wvt-GW-1pw" firstAttribute="centerX" secondItem="ML8-N3-nQQ" secondAttribute="centerX" constant="26" id="ABa-Ks-YXp"/>
                 <constraint firstItem="Bk7-G3-sPF" firstAttribute="centerX" secondItem="ML8-N3-nQQ" secondAttribute="centerX" id="Mn7-Wy-oHS"/>
                 <constraint firstItem="wvt-GW-1pw" firstAttribute="centerY" secondItem="ML8-N3-nQQ" secondAttribute="centerY" id="Vp9-dF-iBV"/>
                 <constraint firstItem="Bk7-G3-sPF" firstAttribute="centerY" secondItem="ML8-N3-nQQ" secondAttribute="centerY" id="g7b-bs-7dy"/>
             </constraints>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <connections>
                 <outlet property="backgroundLayer" destination="Bk7-G3-sPF" id="DQY-J6-yai"/>
                 <outlet property="busIcon" destination="ihJ-1j-xN0" id="ReK-zW-aT7"/>
@@ -70,11 +73,11 @@
                 <outlet property="xConstraint" destination="ABa-Ks-YXp" id="6zc-9M-z13"/>
                 <outlet property="yConstraint" destination="Vp9-dF-iBV" id="f08-Xj-UV4"/>
             </connections>
-            <point key="canvasLocation" x="-689.23076923076917" y="659.71563981042652"/>
+            <point key="canvasLocation" x="-712.30769230769226" y="1011.6113744075828"/>
         </view>
     </objects>
     <resources>
-        <image name="bus.fill" catalog="system" width="128" height="122"/>
+        <image name="bus" catalog="system" width="128" height="122"/>
         <image name="triangle.fill" catalog="system" width="128" height="109"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>

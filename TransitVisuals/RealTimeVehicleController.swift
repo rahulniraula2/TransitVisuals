@@ -139,8 +139,13 @@ extension ViewController {
             } else {
                 let annotationToAdd = BusPointAnnotation()
                 annotationToAdd.coordinate = CLLocationCoordinate2D(latitude: CLLocationDegrees(entity_data.vehicle.position.latitude), longitude: CLLocationDegrees(entity_data.vehicle.position.longitude))
-                
-                annotationToAdd.title = self.tripName[entity_data.vehicle.trip.tripID] ?? ""
+                let trip_id = Int32(entity_data.vehicle.trip.tripID) ?? -1
+                let ids : [Int32] = [trip_id]
+                var trip : [Trips] = []
+                DispatchQueue.main.sync{
+                    trip = TripQueryManager.shared.queryTrips(withIDs: ids)
+                }
+                annotationToAdd.title = trip.first?.trip_headsign ?? ""
                 annotationToAdd.tripID = entity_data.vehicle.trip.tripID
                 annotationToAdd.subtitle = self.tripUpdates[entity_data.vehicle.trip.tripID] ?? ""
                 
