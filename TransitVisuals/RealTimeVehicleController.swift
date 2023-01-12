@@ -21,22 +21,78 @@ extension ViewController {
         }
     }
     
-    //UpdateMap is called by the timer
     @objc func UpdateMap(){
-        self.timeStarted = Date()
-        self.fetchDataVehiclePositions().resume()
+        RealTimeUpdater.shared.getUpdatedVehicles(handleUpdates)
     }
+    
+    func handleUpdates(_ vehicleUpdates : TransitRealtime_FeedMessage, _ tripUpdates : TransitRealtime_FeedMessage) {
+        Task.init(priority: .medium){
+            let messages = await self.handleTripUpdates(tripUpdates)
+            print("Received \(vehicleUpdates.entity.count) updates")
+            self.handleVehicleUpdates(vehicleUpdates, messages)
+        }
+    }
+    
+    func handleTripUpdates(_ tripUpdates : TransitRealtime_FeedMessage) async -> [Int32 : String] {
+        let count = tripUpdates.entity.count
+        var messages = [Int32 : String]()
+        
+        for i in 0..<count {
+            let tripUpdate = tripUpdates.entity[i].tripUpdate
+            let tripID = Int32(tripUpdate.trip.tripID) ?? -1
+            
+            let timeDifference = Double(((tripUpdate.stopTimeUpdate.first?.arrival.time) ?? 0)) - Date.now.timeIntervalSince1970
+            let minutes = String(round(timeDifference * 100)/100)
+            
+            let stopID : String = tripUpdate.stopTimeUpdate.first?.stopID ?? "-1"
+            
+            messages[tripID] = "Arriving at \(await BusStopQueryManager.shared.getBusStop(withID: Int32(stopID)!).title ?? "NA") stop in \(minutes)"
+        }
+        return messages
+    }
+    
+    func handleVehicleUpdates(_ vehicleUpdates : TransitRealtime_FeedMessage, _ messages : [Int32 : String]){
+        
+        let tripIDs = vehicleUpdates.entity.map { entity in
+            Int32(entity.vehicle.trip.tripID) ?? -1
+        }
+        
+        TripQueryManager.shared.getTrips(withIDs: tripIDs)
+        
+        vehicleUpdates.entity.forEach { entity_data in
+            let tripID = Int32(entity_data.vehicle.trip.tripID) ?? -1
+            let vehicleID = entity_data.vehicle.vehicle.id
+            
+            if let annotationToAnimate = self.busAnnotations[vehicleID]  {
+                self.updateVehicleAnnotation(annotationToAnimate, entity_data: entity_data, message: messages[tripID])
+            } else {
+                let annotationToAdd = BusPointAnnotation()
+                annotationToAdd.configureAnnotation(to: entity_data, tripMessage: messages[tripID])
+                busAnnotations[vehicleID] = annotationToAdd
+                DispatchQueue.main.async {
+                    self.mapView.addAnnotation(annotationToAdd)
+                }
+            }
+        }
+        self.GarbageCollector(vehicleUpdates)
+    }
+    
+    func updateVehicleAnnotation(_ annotationToAnimate: BusPointAnnotation, entity_data : TransitRealtime_FeedEntity, message: String?){
+        annotationToAnimate.updateSubtitle(tripMessage: message)
+        UIView.animate(withDuration: 1, animations: {
+            annotationToAnimate.coordinate = CLLocationCoordinate2D(latitude: CLLocationDegrees(entity_data.vehicle.position.latitude), longitude: CLLocationDegrees(entity_data.vehicle.position.longitude))
+            annotationToAnimate.bearing =  CGFloat(entity_data.vehicle.position.bearing - 90).inRadians()
+        })
+    }
+    
     
     //Update is called by the reset button
     //TODO: Rename to Reset
     @IBAction func Update(_ sender: Any) {
         //self.
         self.timer.invalidate()
-        self.scheduledAReun = true
         self.removeAllAnnotations()
-        self.oldMessageHash = -1
-        self.timeStarted = Date()
-        self.fetchDataVehiclePositions().resume()
+        startTimer(5, repeats: true)
     }
     
     //TODO: Center the map to include all the bus stops
@@ -48,43 +104,6 @@ extension ViewController {
         }
     }
     
-    func fetchDataVehiclePositions() -> URLSessionDataTask{
-        
-        let url = K.FindRealTimePositionURL()
-    
-        return self.urlSession.dataTask(with: url) { data,response,error  in
-            if(error == nil){
-                if let data = data {
-                    if(data.hashValue != self.oldMessageHash){
-                        let decodedData = self.decodeFetchedDataIntoMessage(data)
-                        if let decodedData = decodedData {
-                            self.showEntities(decodedData)
-                        }
-                        self.oldMessageHash = data.hashValue
-                    }else {
-                        let tsf = String(format: "%3.0f", self.lastFetch.timeIntervalSinceNow * -1000.0)
-                        print("Same data TNF:" + tsf + " NU:3s")
-                        self.scheduledAReun = true
-                        DispatchQueue.main.async {
-                            self.timer.invalidate()
-                            self.startTimer(3.0, repeats: false)
-                        }
-                    }
-                    
-                }
-            }
-        }
-    }
-        
-    func decodeFetchedDataIntoMessage(_ dataFromURL: Data) -> TransitRealtime_FeedMessage? {
-        do {
-            return try TransitRealtime_FeedMessage(serializedData:dataFromURL)
-        } catch {
-            
-        }
-        return nil
-    }
-    
     func removeAllAnnotations(){
         busAnnotations.forEach { (key: String, value: MKPointAnnotation) in
             DispatchQueue.main.async {
@@ -94,89 +113,12 @@ extension ViewController {
         busAnnotations.removeAll()
     }
     
-    func showEntities(_ message : TransitRealtime_FeedMessage){
-        
-        let url = URL(string: "https://victoria.mapstrat.com/current/gtfrealtime_TripUpdates.bin")!
-    
-        self.urlSession.dataTask(with: url) { [self] data,response,error  in
-            if(error == nil){
-                if let data = data {
-                    let decodedData = self.decodeFetchedDataIntoMessage(data)
-                    if let decodedData = decodedData{
-                        decodedData.entity.forEach { transitRealtime_FeedEntity in
-                            let timeDifference = Double(((transitRealtime_FeedEntity.tripUpdate.stopTimeUpdate.first?.arrival.time) ?? 0)) - Date.now.timeIntervalSince1970
-                            let minutes = String(round(timeDifference * 100)/100)
-                            let stopID : String = transitRealtime_FeedEntity.tripUpdate.stopTimeUpdate.first?.stopID ?? "-1"
-                            self.tripUpdates[transitRealtime_FeedEntity.tripUpdate.trip.tripID] = "Arriving at " + stopID + " stop at" + minutes
-                        }
-                    }
-                }
-                displayUpdatedTripsAndVehicles(message)
-            }
-        }.resume()
-        
-    }
-    
-    func displayUpdatedTripsAndVehicles(_ message : TransitRealtime_FeedMessage){
-        let seconds = (self.timeStarted.timeIntervalSinceNow * -1000.0)
-        self.i = self.i + 1
-        message.entity.forEach { entity_data in
-            if let annotationToAnimate = self.busAnnotations[entity_data.vehicle.vehicle.id]  {
-                DispatchQueue.main.async {
-                    
-                    annotationToAnimate.title = self.tripName[entity_data.vehicle.trip.tripID] ?? ""
-                    annotationToAnimate.subtitle = self.tripUpdates[entity_data.vehicle.trip.tripID] ?? ""
-                    UIView.animate(withDuration: 1, animations: {
-                        annotationToAnimate.coordinate = CLLocationCoordinate2D(latitude: CLLocationDegrees(entity_data.vehicle.position.latitude), longitude: CLLocationDegrees(entity_data.vehicle.position.longitude))
-                        //TODO: Research how to update the view when title/subtitle changes
-                        
-                    })
-                    UIView.animate(withDuration: 1, animations: {
-                        annotationToAnimate.bearing =  CGFloat(entity_data.vehicle.position.bearing - 90).inRadians()
-                    })
-                    
-                }
-            } else {
-                let annotationToAdd = BusPointAnnotation()
-                annotationToAdd.coordinate = CLLocationCoordinate2D(latitude: CLLocationDegrees(entity_data.vehicle.position.latitude), longitude: CLLocationDegrees(entity_data.vehicle.position.longitude))
-                let trip_id = Int32(entity_data.vehicle.trip.tripID) ?? -1
-                let ids : [Int32] = [trip_id]
-                var trip : [Trips] = []
-                DispatchQueue.main.sync{
-                    trip = TripQueryManager.shared.queryTrips(withIDs: ids)
-                }
-                annotationToAdd.title = trip.first?.trip_headsign ?? ""
-                annotationToAdd.tripID = entity_data.vehicle.trip.tripID
-                annotationToAdd.subtitle = self.tripUpdates[entity_data.vehicle.trip.tripID] ?? ""
-                
-                annotationToAdd.bearing = CGFloat(entity_data.vehicle.position.bearing - 90).inRadians()
-                busAnnotations[entity_data.vehicle.vehicle.id] = annotationToAdd
-                
-                DispatchQueue.main.async {
-                    self.mapView.addAnnotation(annotationToAdd)
-                }
-            }
-        }
-
-        GarbageCollector(message)
-        
-        let tsf = String(format: "%3.0f", self.lastFetch.timeIntervalSinceNow * -1000.0)
-        lastFetch = Date()
-        DispatchQueue.main.sync {
-            print("Updated " + String(self.i) + ": " + "#V\(self.mapView.annotations.count - self.totalBusStops)/" + String(message.entity.count) + " took: " + String(format: "%3.0f", seconds) + " TNF: " + tsf)
-        }
-        
-        if (self.scheduledAReun){
-            self.startTimer(20.0, repeats: true)
-            self.scheduledAReun = false
-        }
-    }
-    
     func GarbageCollector(_ message : TransitRealtime_FeedMessage){
-        var keysToRemove : [String] = []
-        if (self.i % 3 == 0){
+        DispatchQueue.global(qos: .background).async{
+            var keysToRemove : [String] = []
             var busRemovalCount = 0
             let cleanUpTimeStart = Date()
+            
             self.busAnnotations.forEach { (key: String, value: MKPointAnnotation) in
                 if(!message.entity.contains(where: { entity in
                     entity.vehicle.vehicle.id == key
@@ -184,13 +126,19 @@ extension ViewController {
                     keysToRemove.append(key)
                 }
             }
+            
+            let vehicleIDs = message.entity.map { enitity in
+                enitity.vehicle.vehicle.id
+            }
+            
+            keysToRemove = self.busAnnotations.keys.filter({ key in
+                !vehicleIDs.contains(key)
+            })
+            
             keysToRemove.forEach { key in
-                let val = self.busAnnotations[key]
-                if let val = val {
+                if let val = self.busAnnotations[key] {
                     DispatchQueue.main.async {
-                        UIView.animate(withDuration: 2) {
-                            self.mapView.removeAnnotation(val)
-                        }
+                        self.mapView.removeAnnotation(val)
                         self.busAnnotations.removeValue(forKey: key)
                         busRemovalCount += 1
                     }

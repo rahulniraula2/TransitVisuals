@@ -11,7 +11,7 @@ import MapKit
 import CoreData
 
 class DataConverters{
-    
+    //MARK: - Bus Stop Annotation
     static func getBusStopAnnotation(_ stop: Stops) -> BusStopAnnotation {
         let busStop = BusStopAnnotation()
         //let coordinate = generateRandomCoordinates()
@@ -33,15 +33,12 @@ class DataConverters{
         return stopAnnotations
     }
     
+    //MARK: - Bus Trip Polyline Overlay
     
-    
-    static func generateRandomCoordinates() -> CLLocationCoordinate2D {
-        let coordinate = CLLocationCoordinate2D(latitude: CLLocationDegrees(randomBetweenNumbers(-90, secondNum: 90)), longitude: CLLocationDegrees(randomBetweenNumbers(-180, secondNum: 180)))
+    static func getRouteOverlay(_ coordinates: [CLLocationCoordinate2D]) -> MKPolyline {
         
-        return coordinate
-    }
-
-    static func randomBetweenNumbers(_ firstNum: CGFloat, secondNum: CGFloat) -> CGFloat {
-        return CGFloat(arc4random()) / CGFloat(UINT32_MAX) * abs(firstNum - secondNum) + min(firstNum, secondNum)
+        let polyline = MKPolyline(coordinates: coordinates, count: coordinates.count)
+        
+        return polyline
     }
 }

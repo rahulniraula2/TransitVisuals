@@ -8,13 +8,6 @@
 import Foundation
 import MapKit
 
-class BusPointAnnotation: MKPointAnnotation {
-    @objc dynamic var bearing: CGFloat = 0.0
-    @objc dynamic var tripID: String = ""
-}
-
-
-
 extension ViewController : MKMapViewDelegate{
     
     func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
@@ -106,32 +99,23 @@ extension ViewController : MKMapViewDelegate{
         // Create a specialized polyline renderer and set the polyline properties.
         let polylineRenderer = MKPolylineRenderer(overlay: polyline)
         polylineRenderer.strokeColor = arc4random() % 2 == 0 ? .black : .red
-            
         polylineRenderer.lineWidth = 2
         return polylineRenderer
     }
     
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
-        let annotation = view.annotation as? BusPointAnnotation
-        if let annotation = annotation{
-            let tripID = annotation.tripID
-            if let shape = self.tripShape[tripID] {
-                DispatchQueue.main.async {
-                    mapView.addOverlay(shape)
-                }
-            }
+        if let annotation = view.annotation as? BusPointAnnotation{
+            let shapeID = annotation.shapeID
+            let overlay = RouteShapeQueryManager.shared.getShape(withID: shapeID)
+            mapView.addOverlay(overlay)
         }
     }
     
     func mapView(_ mapView: MKMapView, didDeselect view: MKAnnotationView) {
-        let annotation = view.annotation as? BusPointAnnotation
-        if let annotation = annotation{
-            let tripID = annotation.tripID
-            if let shape = self.tripShape[tripID] {
-                DispatchQueue.main.async {
-                    mapView.removeOverlay(shape)
-                }
-            }
+        if let annotation = view.annotation as? BusPointAnnotation{
+            let shapeID = annotation.shapeID
+            let overlay = RouteShapeQueryManager.shared.getShape(withID: shapeID)
+            mapView.removeOverlay(overlay)
         }
     }
 }

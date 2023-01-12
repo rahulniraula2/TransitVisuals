@@ -27,12 +27,12 @@
                     <rect key="frame" x="180" y="140" width="30" height="30"/>
                     <subviews>
                         <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="ihJ-1j-xN0">
-                            <rect key="frame" x="5" y="4.3333333333333321" width="20" height="21.333333333333336"/>
+                            <rect key="frame" x="5" y="4.6666666666666679" width="20" height="21"/>
                             <constraints>
                                 <constraint firstAttribute="height" constant="20" id="c4S-ST-WJd"/>
                                 <constraint firstAttribute="width" constant="20" id="l0I-vp-ynO"/>
                             </constraints>
-                            <imageReference key="image" image="bus" catalog="system" symbolScale="default"/>
+                            <imageReference key="image" image="bus.fill" catalog="system" symbolScale="default"/>
                         </imageView>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="26A" textAlignment="center" lineBreakMode="clip" baselineAdjustment="alignBaselines" adjustsLetterSpacingToFitWidth="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Bzr-i7-vra">
                             <rect key="frame" x="9.3333333333333428" y="7" width="12" height="10"/>
@@ -42,7 +42,7 @@
                                 <constraint firstAttribute="width" constant="12" id="ugs-Dh-ryg"/>
                             </constraints>
                             <fontDescription key="fontDescription" name="HelveticaNeue-CondensedBold" family="Helvetica Neue" pointSize="7"/>
-                            <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <color key="textColor" red="0.20561808349999999" green="0.47038370369999999" blue="0.9647536874" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                             <color key="highlightedColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         </label>
                     </subviews>
@@ -77,7 +77,7 @@
         </view>
     </objects>
     <resources>
-        <image name="bus" catalog="system" width="128" height="122"/>
+        <image name="bus.fill" catalog="system" width="128" height="122"/>
         <image name="triangle.fill" catalog="system" width="128" height="109"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>

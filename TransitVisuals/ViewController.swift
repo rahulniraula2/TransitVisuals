@@ -14,33 +14,11 @@ import ZIPFoundation
 class ViewController: UIViewController, URLSessionDelegate, CLLocationManagerDelegate {
     @IBOutlet weak var mapView: MKMapView!
     
-    let urlSession = URLSession(configuration: .default)
-    
-    //Main counter for number of fetches in the application
-    var i = 0
-    
     var busAnnotations = [String:BusPointAnnotation]()
-    var busStopAnnotations = [String:MKPointAnnotation]()
-    var totalBusStops = 0
-    
-    var oldMessageHash : Int = -1
-    
-    var scheduledAReun = false
-    
-    var timeStarted = Date()
-    var lastFetch = Date()
-    var timer = Timer()
-    
-    var tripName  = [String:String]()
-    var tripNames : [String] = []
-    
-    var tripUpdates = [String:String]()
-    var busStopsShown = true
-    
-    var tripShape = [String: MKPolyline]()
     
     let defautls = UserDefaults.standard
     let resourceManager = ResourceManager()
+    var timer = Timer()
 
     
     @IBOutlet weak var loadingView: UIView!
@@ -57,30 +35,28 @@ class ViewController: UIViewController, URLSessionDelegate, CLLocationManagerDel
             handleMapRegionChange(showStops: isAtBigZoom)
         }
     }
-    var task : Task<Void, Error>? = nil
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        mapView.register(ClusterAnnotationView.self, forAnnotationViewWithReuseIdentifier: MKMapViewDefaultClusterAnnotationViewReuseIdentifier)
-        mapView.register(MKBusStopAnnotationView.self, forAnnotationViewWithReuseIdentifier: MKMapViewDefaultAnnotationViewReuseIdentifier)
         mapView.delegate = self
         mapView.mapType = .mutedStandard
         mapView.isRotateEnabled = false
         
+        registerAnnotations()
         self.centerMap(animated: false)
         self.resourceManager.delegate = self
         self.fetchDataIfNeeded()
+        
+    }
+    
+    func registerAnnotations(){
+        mapView.register(ClusterAnnotationView.self, forAnnotationViewWithReuseIdentifier: MKMapViewDefaultClusterAnnotationViewReuseIdentifier)
+        mapView.register(MKBusStopAnnotationView.self, forAnnotationViewWithReuseIdentifier: MKMapViewDefaultAnnotationViewReuseIdentifier)
     }
     
     func handleMapRegionChange(showStops: Bool){
         if(showStops){
-            if let task = self.task {
-                task.cancel()
-                if(task.isCancelled){
-                    print("Old Task was cancelled")
-                }
-            }
-            self.task = Task{
+            Task{
                 let stops = await BusStopQueryManager.shared.getAllBusStops(in: mapView.region)
                 print("returned \(stops.count) stops")
                 for stop in stops {
@@ -94,7 +70,7 @@ class ViewController: UIViewController, URLSessionDelegate, CLLocationManagerDel
         }else{
             for annot in mapView.annotations{
                 if annot is BusStopAnnotation {
-                    UIView.animate(withDuration: 2) {
+                    DispatchQueue.main.async {
                         self.mapView.removeAnnotation(annot)
                     }
                 }
@@ -130,10 +106,10 @@ extension ViewController: ResourceManagerDelegate {
     
     func resourceManager(_ resourceManager: ResourceManager, didFinishLoadingData: Void) {
         DispatchQueue.main.async {
-            debugPrint("DONE LOADING ALL DATA YEYYYYY")
-            DataMangagerInitializer().printTime(since: self.coreDataTime, task: "Doing Everything")
+            DataMangagerInitializer().printTime(since: self.coreDataTime, task: "Loading Database")
+            self.UpdateMap()
+            self.startTimer(5, repeats: true)
         }
-        //self.loadAllBusStops(display: true)
     }
     
     func resourceManager(_ resourceManager: ResourceManager, newDataAvaliable alert: UIAlertController){
