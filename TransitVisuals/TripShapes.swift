@@ -19,20 +19,4 @@ class TripShapes {
     }
 }
 
-class Trips {
-    var tripID : Int
-    var routeID : Int 
-    var headSign: String
-    var blockID : Int
-    var shapeID : Int
-    
-    init(tripID : Int, routeID : Int, headSign: String, blockID : Int, shapeID : Int){
-        self.tripID = tripID
-        self.routeID = routeID
-        self.headSign = headSign
-        self.blockID = blockID
-        self.shapeID = shapeID
-    }
-}
-
 

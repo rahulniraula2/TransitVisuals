@@ -9,8 +9,34 @@ import Foundation
 import UIKit
 import MapKit
 
-class BusAnnotation: UIView {
+class BusPointAnnotation: MKPointAnnotation {
+    @objc dynamic var bearing: CGFloat = 0.0
+    @objc dynamic var tripID: String = ""
+    @objc dynamic var shapeID: Int32 = 0
     
+    func configureAnnotation(to entity_data: TransitRealtime_FeedEntity, tripMessage: String?){
+        self.coordinate = CLLocationCoordinate2D(latitude: CLLocationDegrees(entity_data.vehicle.position.latitude), longitude: CLLocationDegrees(entity_data.vehicle.position.longitude))
+        let trip_id = Int32(entity_data.vehicle.trip.tripID) ?? -1
+        
+        if let trip = TripQueryManager.shared.getTrip(withID: trip_id) {
+            self.title = trip.trip_headsign
+            self.tripID = entity_data.vehicle.trip.tripID
+            self.shapeID = trip.shape_id
+            self.updateSubtitle(tripMessage: tripMessage)
+        }
+        self.bearing = CGFloat(entity_data.vehicle.position.bearing - 90).inRadians()
+    }
+    
+    func updateSubtitle(tripMessage: String?) {
+        if let tripMessage = tripMessage {
+            self.subtitle = tripMessage
+        }else {
+            self.subtitle =  "No updates for this trip"
+        }
+    }
+}
+
+class BusAnnotation: UIView {
    
     @IBOutlet weak var busIcon: UIImageView!
     @IBOutlet weak var busNumberLabel: UILabel!
@@ -36,42 +62,6 @@ class BusAnnotation: UIView {
             kvoToken?.invalidate()
     }
     
-        
-    /*
-        deinit {
-            removeObserverIfAny()
-        }
-
-        
-
-        func showInformation() {
-            addSubview(informationLabel)
-        }
-
-        func hideInformation() {
-            informationLabel.removeFromSuperview()
-        }
-
-        override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-            guard context == &observerContext else {
-                super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
-                return
-            }
-
-            if let annotation = annotation as? MyAnnotation, let information = annotation.information {
-                informationLabel.text = information
-            }
-        }
-     */
-    
-    /*override init(annotation: MKAnnotation?, reuseIdentifier: String?){
-        super.init(annotation: annotation, reuseIdentifier: reuseIdentifier)
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-    }*/
-    
     func rotateTriangle(_ bearing: CGFloat){
         let xOffSet: CGFloat = CGFloat(cos(bearing) * 16.5)
         let yOffSet: CGFloat = CGFloat(sin(bearing) * 16.5)
@@ -79,9 +69,13 @@ class BusAnnotation: UIView {
         self.yConstraint.constant = yOffSet
         self.triangle.transform = .identity
         self.triangle.transform = (self.triangle.transform.rotated(by: CGFloat(bearing + .pi/2)))
-        self.layoutIfNeeded()
+        DispatchQueue.main.async {
+            self.layoutIfNeeded()
+        }
     }
     
     
 }
+
+
 

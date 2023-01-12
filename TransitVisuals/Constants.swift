@@ -82,5 +82,16 @@ struct K {
         }
     }
     
+    struct CoreData {
+        struct Entities{
+            static let Routes = "Routes"
+            static let Shapes = "Shapes"
+            static let Stops = "Stops"
+            static let StopTimes = "StopTimes"
+            static let Trips = "Trips"
+            static let all = [StopTimes, Trips, Shapes, Stops, Routes ]
+        }
+    }
+    
    
 }
