@@ -22,6 +22,7 @@ extension ViewController {
     }
     
     @objc func UpdateMap(){
+        self.startTime = Date.now
         RealTimeUpdater.shared.getUpdatedVehicles(handleUpdates)
     }
     
@@ -30,6 +31,7 @@ extension ViewController {
             let messages = await self.handleTripUpdates(tripUpdates)
             print("Received \(vehicleUpdates.entity.count) updates")
             self.handleVehicleUpdates(vehicleUpdates, messages)
+            self.handleVehicleUpdates2(vehicleUpdates)
         }
     }
     
@@ -92,7 +94,7 @@ extension ViewController {
         //self.
         self.timer.invalidate()
         self.removeAllAnnotations()
-        startTimer(5, repeats: true)
+        startTimer(1, repeats: true)
     }
     
     //TODO: Center the map to include all the bus stops
@@ -118,14 +120,6 @@ extension ViewController {
             var keysToRemove : [String] = []
             var busRemovalCount = 0
             let cleanUpTimeStart = Date()
-            
-            self.busAnnotations.forEach { (key: String, value: MKPointAnnotation) in
-                if(!message.entity.contains(where: { entity in
-                    entity.vehicle.vehicle.id == key
-                })) {
-                    keysToRemove.append(key)
-                }
-            }
             
             let vehicleIDs = message.entity.map { enitity in
                 enitity.vehicle.vehicle.id

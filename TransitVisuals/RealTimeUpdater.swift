@@ -15,6 +15,8 @@ class RealTimeUpdater {
     
     var etagForURL = [String:String]()
     
+    var delegate: RealTimeUpdaterDelegate?
+    
     let serialQueue = DispatchQueue(label: "RealTimeUpdaterQueue")
     
     enum DataTaskError : Error {
@@ -32,8 +34,17 @@ class RealTimeUpdater {
                 switch(vehiclePosition, tripUpdates) {
                 case (.success(let vehicles), .success(let trip)):
                     completion(vehicles, trip)
+                case (.success( _), .failure(let err)):
+                    if err == .notModified{
+                        print("Vehicles were updated but trips were not updated")
+                    }
+                case (.failure(let err), .success( _)):
+                    if err == .notModified{
+                        print("Trips were updated but Vehicles were not updated")
+                    }
                 default:
-                    print("Not needed")
+                    let _ = 1
+                    //print("Not needed")
                 }
             }
         }
@@ -76,4 +87,8 @@ class RealTimeUpdater {
     func decodeFetchedDataIntoMessage(_ dataFromURL: Data) -> TransitRealtime_FeedMessage? {
         return try? TransitRealtime_FeedMessage(serializedData:dataFromURL)
     }
+}
+
+protocol RealTimeUpdaterDelegate {
+    func realTimeUpdater(for: RealTimeUpdater, didReceiveUpdatedVehicles vehicles: TransitRealtime_FeedMessage)
 }

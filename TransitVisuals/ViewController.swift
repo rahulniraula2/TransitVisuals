@@ -16,10 +16,19 @@ class ViewController: UIViewController, URLSessionDelegate, CLLocationManagerDel
     
     var busAnnotations = [String:BusPointAnnotation]()
     
+    var randomVehicleID : String?
+    var busHistory = [String: [CLLocationCoordinate2D]]()
+    var mapOverlay : MKPolyline?
+
+    var randomShapes : [Int32: [CLLocationCoordinate2D]] = [:]
+    var randomOverlays : [Int32: MKPolyline] = [:]
+    
+    var distanceAverage = [Int32: Double]()
+    var startTime = Date()
+    
     let defautls = UserDefaults.standard
     let resourceManager = ResourceManager()
     var timer = Timer()
-
     
     @IBOutlet weak var loadingView: UIView!
     @IBOutlet weak var progressBar: UIProgressView!
@@ -41,12 +50,11 @@ class ViewController: UIViewController, URLSessionDelegate, CLLocationManagerDel
         mapView.delegate = self
         mapView.mapType = .mutedStandard
         mapView.isRotateEnabled = false
-        
         registerAnnotations()
         self.centerMap(animated: false)
         self.resourceManager.delegate = self
         self.fetchDataIfNeeded()
-        
+        startGuessingGame()
     }
     
     func registerAnnotations(){
@@ -107,7 +115,7 @@ extension ViewController: ResourceManagerDelegate {
     func resourceManager(_ resourceManager: ResourceManager, didFinishLoadingData: Void) {
         DispatchQueue.main.async {
             DataMangagerInitializer().printTime(since: self.coreDataTime, task: "Loading Database")
-            self.UpdateMap()
+            //self.UpdateMap()
             self.startTimer(5, repeats: true)
         }
     }

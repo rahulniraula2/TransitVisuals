@@ -11,7 +11,6 @@ import CoreData
 
 class RouteShapeQueryManager: DataQueryManager {
     static let shared = RouteShapeQueryManager()
-    private let pc = (UIApplication.shared.delegate as! AppDelegate).persistentContainer
     var coordinatesForShapeID : [Int32 : MKPolyline] = [:]
     
     func getShape(withID id: Int32) -> MKPolyline{
@@ -26,7 +25,7 @@ class RouteShapeQueryManager: DataQueryManager {
     }
     
     func queryShape(withID id: Int32) -> [CLLocationCoordinate2D]{
-        let context = pc.viewContext
+        let context = RouteShapeQueryManager.pc.viewContext
         
         let fReq: NSFetchRequest<Shapes> = Shapes.fetchRequest()
         

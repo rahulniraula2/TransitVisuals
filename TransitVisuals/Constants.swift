@@ -39,7 +39,6 @@ struct K {
         switch K.data{
         case 1:
             return K.DataSources.Boston.vehicleRealTimeSource
-        
         case 2:
             return K.DataSources.Victoria.vehicleRealTimeSource
             
@@ -47,7 +46,7 @@ struct K {
             return K.DataSources.Texas.vehicleRealTimeSource
         case 4:
             return K.DataSources.Seattle.vehicleRealTimeSource
-        
+            
         default:
             return Self.DataSources.Boston.vehicleRealTimeSource
         }
@@ -92,6 +91,4 @@ struct K {
             static let all = [StopTimes, Trips, Shapes, Stops, Routes ]
         }
     }
-    
-   
 }

@@ -16,9 +16,6 @@ class BusStopQueryManager : DataQueryManager {
     
     var busStops = [Int32: BusStopAnnotation]()
     
-    private static let pc = (UIApplication.shared.delegate as! AppDelegate).persistentContainer
-    let context = pc.newBackgroundContext()
-    
     func getBusStop(withID id: Int32) async -> BusStopAnnotation {
         if let stop = self.busStops[id] {
             return stop

@@ -13,9 +13,6 @@ class TripQueryManager: DataQueryManager {
     
     var trips = [Int32: Trips]()
     
-    private static let pc = (UIApplication.shared.delegate as! AppDelegate).persistentContainer
-    let context = pc.newBackgroundContext()
-    
     func getTrip(withID id: Int32) -> Trips? {
         if let trip = trips[id] {
             return trip
@@ -31,6 +28,7 @@ class TripQueryManager: DataQueryManager {
             })
         }
         var newTrips : [Trips] = []
+        
         if !idToQuery.isEmpty {
             newTrips = queryTrips(withIDs: idToQuery)
         }
@@ -39,12 +37,22 @@ class TripQueryManager: DataQueryManager {
         }
     }
     
+    func getTrips(withServiceID serviceID: Int32) -> [Trips] {
+        let trips = queryTrips(withServiceID: serviceID)
+        for trip in trips {
+            self.trips[trip.trip_id] = trip
+        }
+        return trips
+    }
     
-    func queryTrips(withIDs ids: [Int32] = []) -> [Trips]{
+    
+    func queryTrips(withIDs ids: [Int32] = [], withServiceID serviceID: Int32? = nil) -> [Trips]{
         let fReq: NSFetchRequest<Trips> = Trips.fetchRequest()
         
         if !ids.isEmpty{
             fReq.predicate = NSPredicate(format: "trip_id IN %@", ids)
+        }else if let serviceID = serviceID {
+            fReq.predicate = NSPredicate(format: "service_id == %d", serviceID)
         }
         
         do{
