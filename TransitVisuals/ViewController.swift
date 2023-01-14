@@ -36,13 +36,10 @@ class ViewController: UIViewController, URLSessionDelegate, CLLocationManagerDel
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        BusStopQueryManager.shared
-        TripQueryManager.shared
-        RouteShapeQueryManager.shared
-        StopTimesQueryManager.shared
         mapView.delegate = self
         mapView.mapType = .mutedStandard
         mapView.isRotateEnabled = false
+        TripDeterminer.shared.delegate = self
         registerAnnotations()
         self.centerMap(animated: false)
         self.resourceManager.delegate = self
@@ -61,9 +58,9 @@ class ViewController: UIViewController, URLSessionDelegate, CLLocationManagerDel
     func updateProgressBar(progress: Double){
         let textBuilder = String(round(100 * (progress * 100)) / 100) + "% completed\n"
         
-        DispatchQueue.main.async {
-            self.progressBar.setProgress(Float(progress), animated: true)
-            self.progressLabel.text = textBuilder
+        DispatchQueue.main.async { [weak self] in
+            self?.progressBar.setProgress(Float(progress), animated: true)
+            self?.progressLabel.text = textBuilder
         }
     }
     
@@ -83,6 +80,10 @@ extension ViewController: ResourceManagerDelegate {
     func resourceManager(_ resourceManager: ResourceManager, didFinishLoadingData: Void) {
         DispatchQueue.main.async {
             DataMangagerInitializer().printTime(since: self.coreDataTime, task: "Loading Database")
+            BusStopQueryManager.shared
+            TripQueryManager.shared
+            RouteShapeQueryManager.shared
+            StopTimesQueryManager.shared
             self.UpdateMap()
             self.startTimer(5, repeats: true)
         }

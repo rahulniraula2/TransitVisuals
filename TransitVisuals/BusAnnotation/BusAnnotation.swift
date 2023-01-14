@@ -11,25 +11,44 @@ import MapKit
 
 class BusPointAnnotation: MKPointAnnotation {
     @objc dynamic var bearing: CGFloat = 0.0
-    @objc dynamic var tripID: String = ""
+    @objc dynamic var tripID: Int32 = 0
     @objc dynamic var shapeID: Int32 = 0
     @objc dynamic var determined: Bool = false
+    @objc dynamic var correctlyDetermined: Bool = false
+    @objc dynamic var isObserved: Bool = false
     
-    func configureAnnotation(to entity_data: TransitRealtime_FeedEntity, tripMessage: String?){
-        let location = CLLocationCoordinate2D(latitude: CLLocationDegrees(entity_data.vehicle.position.latitude), longitude: CLLocationDegrees(entity_data.vehicle.position.longitude))
-        let trip_id = Int32(entity_data.vehicle.trip.tripID) ?? -1
+    func configureAnnotation(to vehicle: TransitRealtime_VehiclePosition){
         
-        DispatchQueue.main.async {
-            UIView.animate(withDuration: 1){
-                if let trip = TripQueryManager.shared.getTrip(withID: trip_id) {
-                    self.title = trip.trip_headsign
-                    self.tripID = entity_data.vehicle.trip.tripID
-                    self.shapeID = trip.shape_id
-                    self.updateSubtitle(tripMessage: tripMessage)
-                }
-                self.coordinate = location
-                self.bearing = CGFloat(entity_data.vehicle.position.bearing - 90).inRadians()
+        let location = CLLocationCoordinate2D(latitude: CLLocationDegrees(vehicle.position.latitude), longitude: CLLocationDegrees(vehicle.position.longitude))
+        
+        //let trip_id = Int32(vehicle.trip.tripID) ?? -1
+        
+        /*if let trip = TripQueryManager.shared.getTrip(withID: trip_id) {
+            if(!self.determined){
+                self.title = trip.trip_headsign
+                self.tripID = Int32(vehicle.trip.tripID) ?? -1
+                self.shapeID = trip.shape_id
+                self.updateSubtitle(tripMessage: tripMessage)
             }
+        }*/
+        self.bearing = CGFloat(vehicle.position.bearing - 90).inRadians()
+        UIView.animate(withDuration: 1){
+            self.coordinate = location
+        }
+    }
+    
+    func updateTrip(trip: Trips?, determined: Bool, correctlyDetermined: Bool){
+        self.determined = determined
+        self.subtitle = "THIS BUS TRIP WAS DETERMINED"
+        if let trip = trip {
+            self.correctlyDetermined = correctlyDetermined
+            self.title = trip.trip_headsign
+            self.shapeID = trip.shape_id
+            self.tripID = trip.trip_id
+        }else{
+            self.title = "NA"
+            self.shapeID = -1
+            self.tripID = -1
         }
     }
     
@@ -86,15 +105,11 @@ class BusAnnotation: UIView {
     }
     
     func observe(_ annotation: BusPointAnnotation) {
-        self.kvoToken = annotation.observe(\.bearing, options: .new, changeHandler: { observedAnotation, change in
-            if let newVal = change.newValue {
-                self.rotateTriangle(newVal)
-            }
-        })
-        
-        self.kvoToken = annotation.observe(\.title, options: .new, changeHandler: { observedAnotation, change in
+        self.kvoToken = annotation.observe(\.tripID, options: .new, changeHandler: { [weak self] observedAnotation, change in
             if change.newValue != nil {
-                self.configureAnnotation(to: annotation)
+                DispatchQueue.main.async {
+                    self?.configureAnnotation(to: observedAnotation)
+                }
             }
         })
     }
@@ -105,30 +120,34 @@ class BusAnnotation: UIView {
     }
     
     func rotateTriangle(_ bearing: CGFloat){
-        let xOffSet: CGFloat = CGFloat(cos(bearing) * 16.5)
-        let yOffSet: CGFloat = CGFloat(sin(bearing) * 16.5)
-        self.xConstraint.constant = xOffSet
-        self.yConstraint.constant = yOffSet
-        self.triangle.transform = .identity
-        self.triangle.transform = (self.triangle.transform.rotated(by: CGFloat(bearing + .pi/2)))
-        DispatchQueue.main.async {
-            self.layoutIfNeeded()
-        }
+        //DispatchQueue.main.async {
+            UIView.animate(withDuration: 1){
+                let xOffSet: CGFloat = CGFloat(cos(bearing) * 16.5)
+                let yOffSet: CGFloat = CGFloat(sin(bearing) * 16.5)
+                self.xConstraint.constant = xOffSet
+                self.yConstraint.constant = yOffSet
+                self.triangle.transform = .identity
+                self.triangle.transform = (self.triangle.transform.rotated(by: CGFloat(bearing + .pi/2)))
+                self.layoutIfNeeded()
+            }
+        //}
     }
     
     func configureAnnotation(to annotation: BusPointAnnotation){
         let title = extractBusNumber(annotation.title ?? "")
         self.busNumberLabel.text = title
-        
         self.backgroundLayer.layer.cornerRadius = (self.backgroundLayer.frame.size.width) / 2
         self.backgroundLayer.layer.borderWidth = 2
-        if (annotation.title == ""){
-            self.backgroundLayer.layer.borderColor = #colorLiteral(red: 0.4392156899, green: 0.01176470611, blue: 0.1921568662, alpha: 1).cgColor
+        self.backgroundLayer.layer.borderColor = #colorLiteral(red: 0.01372012775, green: 0.4772869349, blue: 0.9992420077, alpha: 1).cgColor
+        
+        if(annotation.correctlyDetermined){
+            self.busNumberLabel.textColor = .blue
         }else{
-            self.backgroundLayer.layer.borderColor = #colorLiteral(red: 0.01372012775, green: 0.4772869349, blue: 0.9992420077, alpha: 1).cgColor
+            self.busNumberLabel.textColor = .red
         }
         self.rotateTriangle(annotation.bearing)
         self.observe(annotation)
+        
     }
     
     

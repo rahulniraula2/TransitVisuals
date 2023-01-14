@@ -11,16 +11,25 @@ import CoreData
 
 class RouteShapeQueryManager: DataQueryManager {
     static let shared = RouteShapeQueryManager()
-    var coordinatesForShapeID : [Int32 : MKPolyline] = [:]
+    var polyineForShapeID : [Int32 : MKPolyline] = [:]
+    var coordinatesForShapeID : [Int32 : [CLLocationCoordinate2D]] = [:]
     
-    func getShape(withID id: Int32) -> MKPolyline{
-        if let line = self.coordinatesForShapeID[id]{
+    func getPolyine(withID id: Int32) -> MKPolyline{
+        if let line = self.polyineForShapeID[id]{
             return line
         }else{
-            let shape = queryShape(withID: id)
+            let shape = getCoordinates(withID: id)
             let polyline = DataConverters.getRouteOverlay(shape)
-            self.coordinatesForShapeID[id] = polyline
+            self.polyineForShapeID[id] = polyline
             return polyline
+        }
+    }
+    
+    func getCoordinates(withID id: Int32) -> [CLLocationCoordinate2D]{
+        if let coordinates = self.coordinatesForShapeID[id]{
+            return coordinates
+        }else{
+            return queryShape(withID: id)
         }
     }
     
@@ -34,6 +43,7 @@ class RouteShapeQueryManager: DataQueryManager {
         do{
             let shapes =  try context.fetch(fReq)
             let coordinates = getCoordinates(shapes)
+            self.coordinatesForShapeID[id] = coordinates
             return coordinates
         }catch{
             print("Error Fetching Bus Stops")

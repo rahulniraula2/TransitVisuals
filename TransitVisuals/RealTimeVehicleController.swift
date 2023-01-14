@@ -26,10 +26,13 @@ extension ViewController {
     }
     
     func handleUpdates(_ vehicleUpdates : TransitRealtime_FeedMessage, _ tripUpdates : TransitRealtime_FeedMessage) {
-        TripDeterminer.shared.updateSharedModelToLatestTime()
-        let messages = self.handleTripUpdates(tripUpdates)
-        print("Received \(vehicleUpdates.entity.count) updates")
-        self.handleVehicleUpdates(vehicleUpdates, messages)
+        DispatchQueue.main.async {
+            self.GarbageCollector(vehicleUpdates)
+            TripDeterminer.shared.updateSharedModelToLatestTime(vehicleUpdates: vehicleUpdates)
+            let messages = self.handleTripUpdates(tripUpdates)
+            print("Received \(vehicleUpdates.entity.count) updates")
+            self.handleVehicleUpdates(vehicleUpdates, messages)
+        }
     }
     
     func handleTripUpdates(_ tripUpdates : TransitRealtime_FeedMessage) -> [Int32 : String] {
@@ -52,38 +55,10 @@ extension ViewController {
     
     func handleVehicleUpdates(_ vehicleUpdates : TransitRealtime_FeedMessage, _ messages : [Int32 : String]){
         
-        let tripIDs = vehicleUpdates.entity.map { entity in
-            Int32(entity.vehicle.trip.tripID) ?? -1
-        }
-        TripQueryManager.shared.getTrips(withIDs: tripIDs)
-        
         vehicleUpdates.entity.forEach { entity_data in
-            let tripID = Int32(entity_data.vehicle.trip.tripID) ?? -1
-            let vehicleID = entity_data.vehicle.vehicle.id
-            
-            if let annotationToAnimate = self.busAnnotations[vehicleID]  {
-                //self.updateVehicleAnnotation(annotationToAnimate, entity_data: entity_data, message: messages[tripID])
-                annotationToAnimate.configureAnnotation(to: entity_data, tripMessage: messages[tripID])
-            } else {
-                let annotationToAdd = BusPointAnnotation()
-                annotationToAdd.configureAnnotation(to: entity_data, tripMessage: messages[tripID])
-                busAnnotations[vehicleID] = annotationToAdd
-                DispatchQueue.main.async {
-                    self.mapView.addAnnotation(annotationToAdd)
-                }
-            }
-            
-            if(tripID == -1){
-                if let determinedTrip = TripDeterminer.shared.updateVehicleModel(vehicle: entity_data.vehicle){
-                    //trip was determined
-                    
-                }else{
-                    //trip could not be determined
-                }
-            }
+            TripDeterminer.shared.updateVehicleModel(vehicle: entity_data.vehicle)
         }
         
-        self.GarbageCollector(vehicleUpdates)
     }
     
     func updateVehicleAnnotation(_ annotationToAnimate: BusPointAnnotation, entity_data : TransitRealtime_FeedEntity, message: String?){
@@ -151,6 +126,41 @@ extension ViewController {
         }
     }
     
+}
+
+extension ViewController : TripDeterminerDelegate {
+    func tripDeterminer(for: TripDeterminer, didDetermineTripForVehicleID vehicle: TransitRealtime_VehiclePosition, trip: Trips?) {
+        DispatchQueue.main.async {
+            var busAnnotation : BusPointAnnotation!
+            var new = false
+            
+            if self.busAnnotations[vehicle.vehicle.id] != nil {
+                busAnnotation = self.busAnnotations[vehicle.vehicle.id]
+            }else{
+                new = true
+                busAnnotation = BusPointAnnotation()
+            }
+            
+            busAnnotation.configureAnnotation(to: vehicle)
+            
+            if let trip = trip{
+                let isCorrect = vehicle.trip.tripID == String(trip.trip_id)
+                busAnnotation.updateTrip(trip: trip, determined: true, correctlyDetermined: isCorrect)
+            }else{
+                let isCorrect = vehicle.trip.tripID == ""
+                busAnnotation.updateTrip(trip: nil, determined: true, correctlyDetermined: isCorrect)
+            }
+            
+            if(new){
+                self.busAnnotations[vehicle.vehicle.id] = busAnnotation
+                self.mapView.addAnnotation(busAnnotation)
+            }
+        }
+    }
+    
+    func tripDeterminer(for: TripDeterminer, finishedDeterminingTrips: Void) {
+        //self.GarbageCollector()
+    }
 }
 
 

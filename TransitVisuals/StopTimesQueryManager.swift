@@ -12,7 +12,7 @@ class StopTimesQueryManager : DataQueryManager {
     
     static let shared = StopTimesQueryManager()
     
-    let timeSpan = 15
+    let timeSpan = 1
     
     func queryAllCurrentTrips(tripIDs ids: [Int32]) -> [StopTimes]{
         let context = RouteShapeQueryManager.pc.viewContext

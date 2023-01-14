@@ -13,5 +13,5 @@ import MapKit
 
 class DataQueryManager {
     static let pc = (UIApplication.shared.delegate as! AppDelegate).persistentContainer
-    let context = pc.newBackgroundContext()
+    let context = pc.viewContext
 }

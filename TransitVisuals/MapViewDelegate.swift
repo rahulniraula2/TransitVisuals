@@ -59,7 +59,7 @@ extension ViewController : MKMapViewDelegate{
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
         if let annotation = view.annotation as? BusPointAnnotation{
             let shapeID = annotation.shapeID
-            let overlay = RouteShapeQueryManager.shared.getShape(withID: shapeID)
+            let overlay = RouteShapeQueryManager.shared.getPolyine(withID: shapeID)
             mapView.addOverlay(overlay)
         }
     }
@@ -67,21 +67,19 @@ extension ViewController : MKMapViewDelegate{
     func mapView(_ mapView: MKMapView, didDeselect view: MKAnnotationView) {
         if let annotation = view.annotation as? BusPointAnnotation{
             let shapeID = annotation.shapeID
-            let overlay = RouteShapeQueryManager.shared.getShape(withID: shapeID)
+            let overlay = RouteShapeQueryManager.shared.getPolyine(withID: shapeID)
             mapView.removeOverlay(overlay)
         }
     }
     
     func handleMapRegionChange(showStops: Bool){
         if(showStops){
-            Task{
-                let stops = await BusStopQueryManager.shared.getAllBusStops(in: mapView.region)
-                print("returned \(stops.count) stops")
-                for stop in stops {
-                    DispatchQueue.main.async {
-                        if self.mapView.view(for: stop) == nil {
-                            self.mapView.addAnnotation(stop)
-                        }
+            let stops = BusStopQueryManager.shared.getAllBusStops(in: mapView.region)
+            print("returned \(stops.count) stops")
+            for stop in stops {
+                DispatchQueue.main.async {
+                    if self.mapView.view(for: stop) == nil {
+                        self.mapView.addAnnotation(stop)
                     }
                 }
             }
