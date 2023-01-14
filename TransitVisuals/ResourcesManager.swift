@@ -86,7 +86,7 @@ class ResourceManager {
     
     func fetchInitialResources(for controlkler: ViewController){
         //uncomment to force reload data
-        //self.defautls.set("e", forKey: "Etag")
+        self.defautls.set("e", forKey: "Etag")
         
         let session = URLSession(configuration: .default)
         

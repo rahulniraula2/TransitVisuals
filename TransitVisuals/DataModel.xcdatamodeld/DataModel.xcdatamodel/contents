@@ -21,12 +21,12 @@
         <attribute name="stop_name" attributeType="String"/>
     </entity>
     <entity name="StopTimes" representedClassName=".StopTimes" syncable="YES" codeGenerationType="class">
-        <attribute name="arrival_time" optional="YES" attributeType="String"/>
+        <attribute name="arrival_time" attributeType="String"/>
         <attribute name="departure_time" optional="YES" attributeType="String"/>
         <attribute name="stop_headsign" optional="YES" attributeType="String"/>
-        <attribute name="stop_id" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
-        <attribute name="stop_sequence" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
-        <attribute name="trip_id" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="stop_id" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="stop_sequence" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="trip_id" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
     </entity>
     <entity name="Trips" representedClassName=".Trips" syncable="YES" codeGenerationType="class">
         <attribute name="block_id" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>

@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		711C787F2EBED8AB05692F4B /* Pods_TransitVisuals.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37B4A12E5E35D3B0A32DAE10 /* Pods_TransitVisuals.framework */; };
 		8904D5D82971F8B200F71907 /* TripDeterminer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8904D5D72971F8B200F71907 /* TripDeterminer.swift */; };
+		8904D5DA2971FD0C00F71907 /* StopTimesQueryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8904D5D92971FD0C00F71907 /* StopTimesQueryManager.swift */; };
+		8904D5DC2971FEA600F71907 /* ServiceFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8904D5DB2971FEA600F71907 /* ServiceFetcher.swift */; };
+		8904D5E02972110E00F71907 /* DateUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8904D5DF2972110E00F71907 /* DateUtility.swift */; };
 		8921F2DA289BBDB9000A1B4B /* RealTimeVehicleController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8921F2D9289BBDB9000A1B4B /* RealTimeVehicleController.swift */; };
 		89286E93296E7C4900C0DD09 /* BusStopClusterAnnotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89286E92296E7C4900C0DD09 /* BusStopClusterAnnotation.swift */; };
 		89286E96296F4FCB00C0DD09 /* BusStopQueryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89286E95296F4FCB00C0DD09 /* BusStopQueryManager.swift */; };
@@ -43,6 +46,9 @@
 		67A270D1AF26B268B7D4C00E /* Pods-TransitVisuals.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TransitVisuals.release.xcconfig"; path = "Target Support Files/Pods-TransitVisuals/Pods-TransitVisuals.release.xcconfig"; sourceTree = "<group>"; };
 		6CFEF8BA698AA24AC5C345EE /* Pods-TransitVisuals.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TransitVisuals.debug.xcconfig"; path = "Target Support Files/Pods-TransitVisuals/Pods-TransitVisuals.debug.xcconfig"; sourceTree = "<group>"; };
 		8904D5D72971F8B200F71907 /* TripDeterminer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripDeterminer.swift; sourceTree = "<group>"; };
+		8904D5D92971FD0C00F71907 /* StopTimesQueryManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StopTimesQueryManager.swift; sourceTree = "<group>"; };
+		8904D5DB2971FEA600F71907 /* ServiceFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceFetcher.swift; sourceTree = "<group>"; };
+		8904D5DF2972110E00F71907 /* DateUtility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateUtility.swift; sourceTree = "<group>"; };
 		8921F2D9289BBDB9000A1B4B /* RealTimeVehicleController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealTimeVehicleController.swift; sourceTree = "<group>"; };
 		89286E92296E7C4900C0DD09 /* BusStopClusterAnnotation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BusStopClusterAnnotation.swift; sourceTree = "<group>"; };
 		89286E95296F4FCB00C0DD09 /* BusStopQueryManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BusStopQueryManager.swift; sourceTree = "<group>"; };
@@ -103,6 +109,14 @@
 			name = TripDeterminer;
 			sourceTree = "<group>";
 		};
+		8904D5DE297210F600F71907 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				8904D5DF2972110E00F71907 /* DateUtility.swift */,
+			);
+			name = Utilities;
+			sourceTree = "<group>";
+		};
 		89286E94296F4FA300C0DD09 /* QueryManager */ = {
 			isa = PBXGroup;
 			children = (
@@ -110,6 +124,8 @@
 				89286E95296F4FCB00C0DD09 /* BusStopQueryManager.swift */,
 				89286E97296F505500C0DD09 /* TripQueryManager.swift */,
 				89286E99296F50B800C0DD09 /* RouteShapeQueryManager.swift */,
+				8904D5D92971FD0C00F71907 /* StopTimesQueryManager.swift */,
+				8904D5DB2971FEA600F71907 /* ServiceFetcher.swift */,
 			);
 			name = QueryManager;
 			sourceTree = "<group>";
@@ -177,6 +193,7 @@
 				89F384C029692EB400D1E504 /* DataModel.xcdatamodeld */,
 				89BBAEB92898EF44008F21CD /* SceneDelegate.swift */,
 				89BBAEB72898EF44008F21CD /* AppDelegate.swift */,
+				8904D5DE297210F600F71907 /* Utilities */,
 				89BE0B1F28B04B67006DB397 /* Models */,
 				89AA7A6C2970D719004A286D /* ViewController */,
 				89286E94296F4FA300C0DD09 /* QueryManager */,
@@ -332,9 +349,11 @@
 				89C4F305296ACB64005C7168 /* DataQueryManager.swift in Sources */,
 				8980A83028A4DADC00AE6633 /* BusAnnotation.swift in Sources */,
 				8953318C296D34FD00B37B2D /* BusStopAnnotation.swift in Sources */,
+				8904D5DC2971FEA600F71907 /* ServiceFetcher.swift in Sources */,
 				898FF7A92965194B00745426 /* ResourcesManager.swift in Sources */,
 				89533192296D6B0700B37B2D /* BusStopAnnotationView.swift in Sources */,
 				89286E93296E7C4900C0DD09 /* BusStopClusterAnnotation.swift in Sources */,
+				8904D5E02972110E00F71907 /* DateUtility.swift in Sources */,
 				89BBAEBC2898EF44008F21CD /* ViewController.swift in Sources */,
 				89C4F307296ACEA1005C7168 /* DataConverters.swift in Sources */,
 				89286E9A296F50B800C0DD09 /* RouteShapeQueryManager.swift in Sources */,
@@ -352,6 +371,7 @@
 				89BBAEB82898EF44008F21CD /* AppDelegate.swift in Sources */,
 				89BBAEBA2898EF44008F21CD /* SceneDelegate.swift in Sources */,
 				89533194296D71A600B37B2D /* MapViewDelegate.swift in Sources */,
+				8904D5DA2971FD0C00F71907 /* StopTimesQueryManager.swift in Sources */,
 				898E1DA9296FC7AF00B081A5 /* RealTimeUpdater.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

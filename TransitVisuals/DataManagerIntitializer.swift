@@ -19,8 +19,8 @@ class DataMangagerInitializer {
     private let pc = (UIApplication.shared.delegate as! AppDelegate).persistentContainer
     
     /// Serial Queues. Helps with concurent processes with safe data access
-    private let serialQueue = DispatchQueue(label: "TaskNotification.DataManagerInitializer")
-    private let progressQueue = DispatchQueue(label: "ProgressUpdater.DataManagerInitializer")
+    private let serialQueue = DispatchQueue(label: "TaskNotification.DataManagerInitializer", qos: .userInitiated)
+    private let progressQueue = DispatchQueue(label: "ProgressUpdater.DataManagerInitializer", qos: .default)
     
     /// Progress Checker Variables
     private var TasksDelete : [String:Bool] = [:]
@@ -62,20 +62,19 @@ class DataMangagerInitializer {
     //MARK: - Database loading helpers
     
     private func loadAll() {
-        DispatchQueue.global(qos: .default).async {
+        DispatchQueue.global(qos: .background).async {
             self.loadRoutes()
         }
         DispatchQueue.global(qos: .default).async {
             self.loadShapes()
         }
-        DispatchQueue.global(qos: .default).async {
+        DispatchQueue.global(qos: .background).async {
             self.loadStops()
         }
-        DispatchQueue.global(qos: .default).async {
-            //self.initStopTimes()
+        DispatchQueue.global(qos: .userInteractive).async {
             self.concurentLoadStopTime()
         }
-        DispatchQueue.global(qos: .default).async {
+        DispatchQueue.global(qos: .background).async {
             self.loadTrips()
         }
     }

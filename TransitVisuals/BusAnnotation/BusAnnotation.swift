@@ -13,25 +13,24 @@ class BusPointAnnotation: MKPointAnnotation {
     @objc dynamic var bearing: CGFloat = 0.0
     @objc dynamic var tripID: String = ""
     @objc dynamic var shapeID: Int32 = 0
-    //var coordinateHistory: [(UInt64,CLLocationCoordinate2D)] = []
-    //var possibleTrips: [Int32:Int] = [:]
+    @objc dynamic var determined: Bool = false
     
     func configureAnnotation(to entity_data: TransitRealtime_FeedEntity, tripMessage: String?){
         let location = CLLocationCoordinate2D(latitude: CLLocationDegrees(entity_data.vehicle.position.latitude), longitude: CLLocationDegrees(entity_data.vehicle.position.longitude))
-        self.coordinate = location
-        
-        //let timeStamp = entity_data.vehicle.timestamp
-        //self.coordinateHistory.append((timeStamp, location))
-        
         let trip_id = Int32(entity_data.vehicle.trip.tripID) ?? -1
         
-        if let trip = TripQueryManager.shared.getTrip(withID: trip_id) {
-            self.title = trip.trip_headsign
-            self.tripID = entity_data.vehicle.trip.tripID
-            self.shapeID = trip.shape_id
-            self.updateSubtitle(tripMessage: tripMessage)
+        DispatchQueue.main.async {
+            UIView.animate(withDuration: 1){
+                if let trip = TripQueryManager.shared.getTrip(withID: trip_id) {
+                    self.title = trip.trip_headsign
+                    self.tripID = entity_data.vehicle.trip.tripID
+                    self.shapeID = trip.shape_id
+                    self.updateSubtitle(tripMessage: tripMessage)
+                }
+                self.coordinate = location
+                self.bearing = CGFloat(entity_data.vehicle.position.bearing - 90).inRadians()
+            }
         }
-        self.bearing = CGFloat(entity_data.vehicle.position.bearing - 90).inRadians()
     }
     
     func updateSubtitle(tripMessage: String?) {

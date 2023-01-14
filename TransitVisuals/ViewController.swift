@@ -16,17 +16,6 @@ class ViewController: UIViewController, URLSessionDelegate, CLLocationManagerDel
     
     var busAnnotations = [String:BusPointAnnotation]()
     
-    var randomVehicleID : String?
-    var busHistory = [String: [CLLocationCoordinate2D]]()
-    var mapOverlay : MKPolyline?
-
-    var randomShapes : [Int32: [CLLocationCoordinate2D]] = [:]
-    var randomOverlays : [Int32: MKPolyline] = [:]
-    
-    var distanceAverage = [Int32: Double]()
-    var startTime = Date()
-    
-    let defautls = UserDefaults.standard
     let resourceManager = ResourceManager()
     var timer = Timer()
     
@@ -47,6 +36,10 @@ class ViewController: UIViewController, URLSessionDelegate, CLLocationManagerDel
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        BusStopQueryManager.shared
+        TripQueryManager.shared
+        RouteShapeQueryManager.shared
+        StopTimesQueryManager.shared
         mapView.delegate = self
         mapView.mapType = .mutedStandard
         mapView.isRotateEnabled = false
@@ -54,36 +47,11 @@ class ViewController: UIViewController, URLSessionDelegate, CLLocationManagerDel
         self.centerMap(animated: false)
         self.resourceManager.delegate = self
         self.fetchDataIfNeeded()
-        startGuessingGame()
     }
     
     func registerAnnotations(){
         mapView.register(ClusterAnnotationView.self, forAnnotationViewWithReuseIdentifier: MKMapViewDefaultClusterAnnotationViewReuseIdentifier)
         mapView.register(MKBusStopAnnotationView.self, forAnnotationViewWithReuseIdentifier: MKMapViewDefaultAnnotationViewReuseIdentifier)
-    }
-    
-    func handleMapRegionChange(showStops: Bool){
-        if(showStops){
-            Task{
-                let stops = await BusStopQueryManager.shared.getAllBusStops(in: mapView.region)
-                print("returned \(stops.count) stops")
-                for stop in stops {
-                    DispatchQueue.main.async {
-                        if self.mapView.view(for: stop) == nil {
-                            self.mapView.addAnnotation(stop)
-                        }
-                    }
-                }
-            }
-        }else{
-            for annot in mapView.annotations{
-                if annot is BusStopAnnotation {
-                    DispatchQueue.main.async {
-                        self.mapView.removeAnnotation(annot)
-                    }
-                }
-            }
-        }
     }
     
     func fetchDataIfNeeded(){
@@ -115,7 +83,7 @@ extension ViewController: ResourceManagerDelegate {
     func resourceManager(_ resourceManager: ResourceManager, didFinishLoadingData: Void) {
         DispatchQueue.main.async {
             DataMangagerInitializer().printTime(since: self.coreDataTime, task: "Loading Database")
-            //self.UpdateMap()
+            self.UpdateMap()
             self.startTimer(5, repeats: true)
         }
     }

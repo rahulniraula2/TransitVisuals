@@ -15,20 +15,31 @@ class BusStopQueryManager : DataQueryManager {
     static let shared = BusStopQueryManager()
     
     var busStops = [Int32: BusStopAnnotation]()
+    var stops = [Int32: Stops]()
     
-    func getBusStop(withID id: Int32) async -> BusStopAnnotation {
+    func getBusStop(withID id: Int32) -> BusStopAnnotation {
         if let stop = self.busStops[id] {
             return stop
         }else {
-            let stop = await queryBusStops(withIDs: [id]).first!
+            let stop = queryBusStops(withIDs: [id]).first!
             let stopAnnotation = DataConverters.getBusStopAnnotation(stop)
             self.busStops[id] = stopAnnotation
             return stopAnnotation
         }
     }
     
-    func getAllBusStops(in mapRegion: MKCoordinateRegion) async -> [BusStopAnnotation]{
-        let stops = await queryBusStops(in : mapRegion)
+    func getStop(withID id: Int32) -> Stops {
+        if let stop = self.stops[id] {
+            return stop
+        }else{
+            let stop = queryBusStops(withIDs: [id]).first!
+            self.stops[id] = stop
+            return stop
+        }
+    }
+    
+    func getAllBusStops(in mapRegion: MKCoordinateRegion) -> [BusStopAnnotation]{
+        let stops = queryBusStops(in : mapRegion)
         var returnAnnotation : [BusStopAnnotation] = []
         
         for stop in stops {
@@ -37,6 +48,7 @@ class BusStopQueryManager : DataQueryManager {
             }else{
                 let annot = DataConverters.getBusStopAnnotation(stop)
                 self.busStops[stop.stop_id] = annot
+                self.stops[stop.stop_id] = stop
                 returnAnnotation.append(annot)
             }
         }
@@ -44,7 +56,7 @@ class BusStopQueryManager : DataQueryManager {
         return returnAnnotation
     }
     
-    private func queryBusStops(withIDs ids: [Int32] = [], in mapRegion: MKCoordinateRegion? = nil) async -> [Stops]{
+    private func queryBusStops(withIDs ids: [Int32] = [], in mapRegion: MKCoordinateRegion? = nil) -> [Stops]{
         
         let fReq: NSFetchRequest<Stops> = Stops.fetchRequest()
         

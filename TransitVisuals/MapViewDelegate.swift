@@ -71,6 +71,30 @@ extension ViewController : MKMapViewDelegate{
             mapView.removeOverlay(overlay)
         }
     }
+    
+    func handleMapRegionChange(showStops: Bool){
+        if(showStops){
+            Task{
+                let stops = await BusStopQueryManager.shared.getAllBusStops(in: mapView.region)
+                print("returned \(stops.count) stops")
+                for stop in stops {
+                    DispatchQueue.main.async {
+                        if self.mapView.view(for: stop) == nil {
+                            self.mapView.addAnnotation(stop)
+                        }
+                    }
+                }
+            }
+        }else{
+            for annot in mapView.annotations{
+                if annot is BusStopAnnotation {
+                    DispatchQueue.main.async {
+                        self.mapView.removeAnnotation(annot)
+                    }
+                }
+            }
+        }
+    }
 }
 
 extension BinaryFloatingPoint {

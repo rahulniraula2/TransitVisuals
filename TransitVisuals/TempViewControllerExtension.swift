@@ -9,7 +9,7 @@ import UIKit
 import MapKit
 
 extension ViewController{
-    
+  /*
     func startGuessingGame(){
         let todaysServiceID = getTodaysServiceID()
         let trips : [Trips] = DataQueryManager.getAllTrips(forServiceID: todaysServiceID)
@@ -244,4 +244,5 @@ extension ViewController{
         
         return (returnVal, vehicle!, randomVehicleID!)
     }
+   */
 }
