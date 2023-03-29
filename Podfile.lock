@@ -1,0 +1,24 @@
+PODS:
+  - SwiftCSV (0.8.0)
+  - SwiftProtobuf (1.19.1)
+  - ZIPFoundation (0.9.13)
+
+DEPENDENCIES:
+  - SwiftCSV
+  - SwiftProtobuf (~> 1.19.1)
+  - ZIPFoundation
+
+SPEC REPOS:
+  trunk:
+    - SwiftCSV
+    - SwiftProtobuf
+    - ZIPFoundation
+
+SPEC CHECKSUMS:
+  SwiftCSV: 93af77bc1cf4946e2a0f5792acd94182243dc256
+  SwiftProtobuf: 59d9ea2eb5f84b509f32d170a65f3348ae758f1e
+  ZIPFoundation: ae5b4b813d216d3bf0a148773267fff14bd51d37
+
+PODFILE CHECKSUM: f43de71f803d961f4e4ad91c4a4ba68c00ebdc11
+
+COCOAPODS: 1.11.2
